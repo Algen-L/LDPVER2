@@ -1021,11 +1021,39 @@ class AdminController extends Controller
 
         $this->logRepo->logAction($_SESSION['user_id'], 'Viewed Specific Activity', $activity['title']);
 
+        // Fetch Immediate Head Name (SDS)
+        $sdsName = 'SDS';
+        try {
+            $stmt = $this->pdo->prepare("SELECT full_name FROM users WHERE role = 'immediate_head' LIMIT 1");
+            $stmt->execute();
+            $sdsUser = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($sdsUser && !empty($sdsUser['full_name'])) {
+                $sdsName = $sdsUser['full_name'];
+            }
+        } catch (Exception $e) {
+            // Fallback to 'SDS'
+        }
+
+        // Fetch Head HR Name
+        $hrName = 'HR OFFICER';
+        try {
+            $stmt = $this->pdo->prepare("SELECT full_name FROM users WHERE role = 'head_hr' LIMIT 1");
+            $stmt->execute();
+            $hrUser = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($hrUser && !empty($hrUser['full_name'])) {
+                $hrName = $hrUser['full_name'];
+            }
+        } catch (Exception $e) {
+            // Fallback
+        }
+
         $this->view('admin/view_activity', [
             'activity' => $activity,
             'pdo' => $this->pdo,
             'user' => $this->userRepo->getUserById($_SESSION['user_id']),
-            'notifRepo' => $this->notifRepo
+            'notifRepo' => $this->notifRepo,
+            'sds_name' => $sdsName,
+            'hr_name' => $hrName
         ]);
     }
 

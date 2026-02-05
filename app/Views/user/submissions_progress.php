@@ -153,13 +153,13 @@
                     <div style="width: 160px;">
                         <select name="status" class="form-control" style="height: 38px;">
                             <option value="">All Statuses</option>
-                            <option value="Pending" <?php echo $filters['status'] == 'Pending' ? 'selected' : ''; ?>
-                                >Pending</option>
-                            <option value="Reviewed" <?php echo $filters['status'] == 'Reviewed' ? 'selected' : ''; ?>
-                                >Reviewed</option>
+                            <option value="Pending" <?php echo $filters['status'] == 'Pending' ? 'selected' : ''; ?>>
+                                Pending</option>
+                            <option value="Reviewed" <?php echo $filters['status'] == 'Reviewed' ? 'selected' : ''; ?>>
+                                Reviewed</option>
                             <option value="Recommending" <?php echo $filters['status'] == 'Recommending' ? 'selected' : ''; ?>>Recommending</option>
-                            <option value="Approved" <?php echo $filters['status'] == 'Approved' ? 'selected' : ''; ?>
-                                >Approved</option>
+                            <option value="Approved" <?php echo $filters['status'] == 'Approved' ? 'selected' : ''; ?>>
+                                Approved</option>
                         </select>
                     </div>
                     <button type="submit" class="btn btn-primary" style="height: 38px;"><i class="bi bi-funnel"></i>
@@ -190,6 +190,9 @@
                                             <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--primary);">
                                                 <?php echo htmlspecialchars($act['title']); ?>
                                             </h3>
+                                            <?php
+                                            $isRelevantExpertise = strpos($act['competency'], 'Relevant Expertise') !== false;
+                                            ?>
                                             <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">
                                                 <span><i class="bi bi-geo-alt"></i>
                                                     <?php echo htmlspecialchars($act['venue']); ?>
@@ -200,27 +203,43 @@
                                             </div>
                                         </div>
                                         <div style="text-align: right;">
-                                            <span class="activity-status-badge status-pending"
-                                                style="padding: 4px 12px; font-size: 0.75rem;">
-                                                <?php echo $act['status'] ?? 'Pending'; ?>
-                                            </span>
+                                            <?php if ($isRelevantExpertise): ?>
+                                                <span class="activity-status-badge"
+                                                    style="padding: 4px 12px; font-size: 0.75rem; background: #e0e7ff; color: #4338ca; border: 1px solid #c7d2fe;">
+                                                    <i class="bi bi-bookmark-star-fill"></i> Recorded Entry
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="activity-status-badge status-pending"
+                                                    style="padding: 4px 12px; font-size: 0.75rem;">
+                                                    <?php echo $act['status'] ?? 'Pending'; ?>
+                                                </span>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
 
-                                    <div class="prog-track-wrapper">
-                                        <div class="prog-track-line"></div>
-                                        <div class="prog-track-fill" style="width: <?php echo $line_pct; ?>%;"></div>
-                                        <div class="prog-steps">
-                                            <?php foreach ($prog['stages'] as $stage): ?>
-                                                <div class="prog-step <?php echo $stage['completed'] ? 'active' : ''; ?>">
-                                                    <div class="prog-icon"><i class="bi <?php echo $stage['icon']; ?>"></i></div>
-                                                    <span class="prog-label">
-                                                        <?php echo $stage['label']; ?>
-                                                    </span>
-                                                </div>
-                                            <?php endforeach; ?>
+                                    <?php if (!$isRelevantExpertise): ?>
+                                        <div class="prog-track-wrapper">
+                                            <div class="prog-track-line"></div>
+                                            <div class="prog-track-fill" style="width: <?php echo $line_pct; ?>%;"></div>
+                                            <div class="prog-steps">
+                                                <?php foreach ($prog['stages'] as $stage): ?>
+                                                    <div class="prog-step <?php echo $stage['completed'] ? 'active' : ''; ?>">
+                                                        <div class="prog-icon"><i class="bi <?php echo $stage['icon']; ?>"></i></div>
+                                                        <span class="prog-label">
+                                                            <?php echo $stage['label']; ?>
+                                                        </span>
+                                                    </div>
+                                                <?php endforeach; ?>
+                                            </div>
                                         </div>
-                                    </div>
+                                    <?php else: ?>
+                                        <div
+                                            style="margin-top: 16px; padding: 12px; background: #f8fafc; border-radius: 8px; font-size: 0.85rem; color: #64748b; display: flex; align-items: center; gap: 8px;">
+                                            <i class="bi bi-info-circle-fill" style="color: #4338ca;"></i>
+                                            <span>This activity is recorded via Relevant Expertise bypass and does not require
+                                                approval.</span>
+                                        </div>
+                                    <?php endif; ?>
 
                                     <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
                                         <a href="<?php echo PUBLIC_ROOT; ?>index.php/user/view-activity?id=<?php echo $act['id']; ?>"

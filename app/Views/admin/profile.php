@@ -322,55 +322,11 @@
                                                 }
                                             }
                                         </script>
-                                        <div class="form-grid-profile">
-                                            <div>
-                                                <div class="form-group">
-                                                    <label class="form-label">Full Name</label>
-                                                    <input type="text" name="full_name" class="form-control" required
-                                                        value="<?php echo htmlspecialchars($user['full_name']); ?>">
-                                                </div>
-                                                <div class="form-group">
-                                                    <label class="form-label">Position / Designation</label>
-                                                    <input type="text" name="position" class="form-control"
-                                                        value="<?php echo htmlspecialchars($user['position'] ?: ''); ?>">
-                                                </div>
-                                                <div class="form-group">
-                                                    <label class="form-label">Office / Station</label>
-                                                    <input type="text" name="office_station" class="form-control" required
-                                                        value="<?php echo htmlspecialchars($user['office_station']); ?>">
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <div class="form-group">
-                                                    <label class="form-label">Employee Number</label>
-                                                    <input type="text" name="employee_number" class="form-control"
-                                                        value="<?php echo htmlspecialchars($user['employee_number'] ?? ''); ?>">
-                                                </div>
-                                                <div class="form-group">
-                                                    <label class="form-label">Rating Period</label>
-                                                    <input type="text" name="rating_period" class="form-control"
-                                                        value="<?php echo htmlspecialchars($user['rating_period'] ?? ''); ?>">
-                                                </div>
-                                                <div class="form-group">
-                                                    <label class="form-label">Area of Specialization</label>
-                                                    <input type="text" name="area_of_specialization" class="form-control"
-                                                        value="<?php echo htmlspecialchars($user['area_of_specialization'] ?? ''); ?>">
-                                                </div>
-                                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                                                    <div class="form-group">
-                                                        <label class="form-label">Age</label>
-                                                        <input type="number" name="age" class="form-control"
-                                                            value="<?php echo htmlspecialchars($user['age']); ?>">
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="form-label">Sex</label>
-                                                        <select name="sex" class="form-control">
-                                                            <option value="">Select...</option>
-                                                            <option value="Male" <?php echo ($user['sex'] ?? '') === 'Male' ? 'selected' : ''; ?>>Male</option>
-                                                            <option value="Female" <?php echo ($user['sex'] ?? '') === 'Female' ? 'selected' : ''; ?>>Female</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
+                                        <div>
+                                            <div class="form-group">
+                                                <label class="form-label">Full Name</label>
+                                                <input type="text" name="full_name" class="form-control" required
+                                                    value="<?php echo htmlspecialchars($user['full_name']); ?>">
                                             </div>
                                         </div>
                                         <div class="form-group mt-3">

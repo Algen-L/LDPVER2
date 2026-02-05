@@ -7,12 +7,15 @@ use App\Models\ActivityRepository;
 use App\Models\ILDNRepository;
 use App\Models\NotificationRepository;
 
+use App\Models\ReferenceRepository;
+
 class UserController extends Controller
 {
     private $userRepo;
     private $activityRepo;
     private $ildnRepo;
     private $notifRepo;
+    private $refRepo;
     private $pdo;
 
     public function __construct()
@@ -22,155 +25,143 @@ class UserController extends Controller
         $this->activityRepo = new ActivityRepository($this->pdo);
         $this->ildnRepo = new ILDNRepository($this->pdo);
         $this->notifRepo = new NotificationRepository($this->pdo);
+        $this->refRepo = new ReferenceRepository($this->pdo);
 
         if (!isset($_SESSION['user_id'])) {
             $this->redirect('');
         }
     }
+    // ... (home and profile methods unchanged)
 
-    public function home()
-    {
-        $user_id = $_SESSION['user_id'];
-        $user = $this->userRepo->getUserById($user_id);
-
-        if (!$user) {
-            session_destroy();
-            $this->redirect('');
-        }
-
-        // AJAX handler for marking as read
-        if (isset($_GET['action']) && $_GET['action'] === 'read_notif' && isset($_GET['notif_id'])) {
-            $notif_id = (int) $_GET['notif_id'];
-            if ($this->notifRepo->markAsRead($notif_id, $user_id)) {
-                header('Content-Type: application/json');
-                echo json_encode(['success' => true]);
-            } else {
-                header('Content-Type: application/json');
-                echo json_encode(['success' => false]);
-            }
-            exit;
-        }
-
-        $activities = $this->activityRepo->getActivitiesByUser($user_id, ['limit' => 10]);
-        $stats = $this->activityRepo->getUserStats($user_id);
-        $all_ildns = $this->ildnRepo->getILDNsByUser($user_id);
-        $notifications = $this->notifRepo->getUnreadNotifications($user_id);
-
-        $total_count = $stats['total'];
-        $approved_count = $stats['approved'] ?: 0;
-        $progress_pct = $total_count > 0 ? round(($approved_count / $total_count) * 100) : 0;
-
-        $unaddressed_needs = array_filter($all_ildns, function ($item) {
-            return $item['usage_count'] == 0;
-        });
-
-        $this->view('user/home', [
-            'user' => $user,
-            'activities' => $activities,
-            'stats' => $stats,
-            'total_count' => $total_count,
-            'approved_count' => $approved_count,
-            'progress_pct' => $progress_pct,
-            'unaddressed_needs' => $unaddressed_needs,
-            'notifications' => $notifications,
-            'pdo' => $this->pdo,
-            'notifRepo' => $this->notifRepo
-        ]);
-    }
 
     public function profile()
     {
         $user_id = $_SESSION['user_id'];
         $user = $this->userRepo->getUserById($user_id);
 
-        if (!$user) {
-            session_destroy();
-            $this->redirect('');
-        }
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-        // Handle Profile Update
-        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_profile'])) {
-            $updateData = [
-                'full_name' => trim($_POST['full_name']),
-                'office_station' => trim($_POST['office_station']),
-                'position' => trim($_POST['position']),
-                'rating_period' => trim($_POST['rating_period']),
-                'area_of_specialization' => trim($_POST['area_of_specialization']),
-                'age' => (int) $_POST['age'],
-                'sex' => trim($_POST['sex'])
-            ];
+            // 1. Update Profile Information
+            if (isset($_POST['update_profile'])) {
+                $updateData = [
+                    'full_name' => trim($_POST['full_name']),
+                    'position' => trim($_POST['position']),
+                    'office_station' => trim($_POST['office_station']),
+                    'rating_period' => trim($_POST['rating_period']),
+                    'area_of_specialization' => trim($_POST['area_of_specialization']),
+                    'age' => (int) $_POST['age'],
+                    'sex' => trim($_POST['sex'])
+                ];
 
-            if (!empty($_POST['password'])) {
-                $updateData['password'] = password_hash($_POST['password'], PASSWORD_DEFAULT);
-            }
-
-            if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
-                $uploadDir = __DIR__ . '/../../public/uploads/profile_pics/';
-                if (!is_dir($uploadDir))
-                    mkdir($uploadDir, 0777, true);
-                $fileName = uniqid() . '_' . preg_replace('/[^a-zA-Z0-9\._-]/', '', basename($_FILES['profile_picture']['name']));
-                if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $uploadDir . $fileName)) {
-                    $updateData['profile_picture'] = 'uploads/profile_pics/' . $fileName;
+                if (!empty($_POST['password'])) {
+                    $updateData['password'] = password_hash(trim($_POST['password']), PASSWORD_DEFAULT);
                 }
+
+                // Handle Profile Picture Upload
+                $profile_pic_path = $this->saveUpload('profile_picture', 'avatars', 'avatar_' . $user_id);
+                if ($profile_pic_path) {
+                    $updateData['profile_picture'] = $profile_pic_path;
+                }
+
+                if ($this->userRepo->updateUser($user_id, $updateData)) {
+                    $_SESSION['toast'] = ['title' => 'Success', 'message' => 'Profile updated successfully!', 'type' => 'success'];
+                }
+                $this->redirect('user/profile');
             }
 
-            if ($this->userRepo->updateUserProfile($user_id, $updateData)) {
-                $_SESSION['toast'] = ['title' => 'Profile Updated', 'message' => 'Your profile has been successfully updated.', 'type' => 'success'];
-                $_SESSION['full_name'] = $updateData['full_name'];
-                if (isset($updateData['profile_picture']))
-                    $_SESSION['profile_picture'] = $updateData['profile_picture'];
+            // 2. Add ILDN
+            if (isset($_POST['add_ildn'])) {
+                $need_text = trim($_POST['need_text']);
+                $description = trim($_POST['description']);
+                if ($this->ildnRepo->createILDN($user_id, $need_text, $description)) {
+                    $_SESSION['toast'] = ['title' => 'Success', 'message' => 'Development need added!', 'type' => 'success'];
+                }
+                $this->redirect('user/profile');
+            }
+
+            // 3. Delete ILDN
+            if (isset($_POST['delete_ildn'])) {
+                $ildn_id = (int) $_POST['ildn_id'];
+                if ($this->ildnRepo->deleteILDN($ildn_id, $user_id)) {
+                    $_SESSION['toast'] = ['title' => 'Success', 'message' => 'Development need removed.', 'type' => 'success'];
+                }
                 $this->redirect('user/profile');
             }
         }
 
-        // Handle Certificate Upload
-        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['upload_certificate'])) {
-            $activity_id = (int) $_POST['activity_id'];
-            if (isset($_FILES['certificate']) && $_FILES['certificate']['error'] === UPLOAD_ERR_OK) {
-                $uploadDir = __DIR__ . '/../../public/uploads/certificates/';
-                if (!is_dir($uploadDir))
-                    mkdir($uploadDir, 0777, true);
-                $fileExt = strtolower(pathinfo($_FILES['certificate']['name'], PATHINFO_EXTENSION));
-                $fileName = uniqid() . '_cert_' . $activity_id . '.' . $fileExt;
-                if (move_uploaded_file($_FILES['certificate']['tmp_name'], $uploadDir . $fileName)) {
-                    $dbPath = 'uploads/certificates/' . $fileName;
-                    $this->activityRepo->updateActivity($activity_id, $user_id, ['certificate_path' => $dbPath]);
-                    $_SESSION['toast'] = ['title' => 'Success', 'message' => 'Certificate uploaded successfully!', 'type' => 'success'];
-                    $this->redirect('user/profile');
-                }
+        $user_ildns = $this->ildnRepo->getILDNsByUser($user_id);
+        $notifications = $this->notifRepo->getUnreadNotifications($user_id);
+
+        // Fetch Certificates (from activities with certificate_path)
+        $all_activities = $this->activityRepo->getActivitiesByUser($user_id, []);
+        $certificates = [];
+        foreach ($all_activities as $act) {
+            if (!empty($act['certificate_path'])) {
+                $certificates[] = $act;
             }
         }
 
-        // Handle ILDN Management
-        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_ildn'])) {
-            $this->ildnRepo->createILDN($user_id, trim($_POST['need_text']), trim($_POST['description'] ?? ''));
-            $this->redirect('user/profile');
-        }
-
-        if (isset($_GET['delete_ildn'])) {
-            $this->ildnRepo->deleteILDN((int) $_GET['delete_ildn'], $user_id);
-            $this->redirect('user/profile');
-        }
-
-        // Handle Clear Notifications
-        if (isset($_GET['clear_notifications'])) {
-            $this->notifRepo->deleteAllNotifications($user_id);
-            $_SESSION['toast'] = ['title' => 'Success', 'message' => 'Message log cleared.', 'type' => 'success'];
-            $this->redirect('user/profile');
-        }
-
-        $activities = $this->activityRepo->getActivitiesByUser($user_id);
-        $user_ildns = $this->ildnRepo->getILDNsByUser($user_id);
-        // Fetch ALL notifications for the log, not just unread
-        $notifications = $this->notifRepo->getAllUserNotifications($user_id);
-
         $this->view('user/profile', [
             'user' => $user,
-            'activities' => $activities,
             'user_ildns' => $user_ildns,
             'notifications' => $notifications,
-            'pdo' => $this->pdo,
-            'notifRepo' => $this->notifRepo
+            'certificates' => $certificates,
+            'activities' => $all_activities
+        ]);
+    }
+
+    public function home()
+    {
+        $user_id = $_SESSION['user_id'];
+
+        // Handle Notification Actions (AJAX)
+        if (isset($_GET['action']) && $_GET['action'] == 'read_notif' && isset($_GET['notif_id'])) {
+            $success = $this->notifRepo->markAsRead($_GET['notif_id'], $user_id);
+            header('Content-Type: application/json');
+            echo json_encode(['success' => (bool) $success]);
+            exit;
+        }
+
+        $user = $this->userRepo->getUserById($user_id);
+
+        // Activity Stats
+        $all_activities = $this->activityRepo->getActivitiesByUser($user_id, []);
+        $total_count = count($all_activities);
+        $approved_count = 0;
+
+        foreach ($all_activities as $act) {
+            if (!empty($act['approved_sds'])) {
+                $approved_count++;
+            }
+        }
+
+        // Unaddressed Needs
+        $all_ildns = $this->ildnRepo->getILDNsByUser($user_id);
+        $unaddressed_needs = array_filter($all_ildns, function ($ildn) {
+            return $ildn['usage_count'] == 0;
+        });
+
+        // Notifications
+        $notifications = $this->notifRepo->getUnreadNotifications($user_id);
+
+        // Progress Calculation
+        $total_needs = count($all_ildns);
+        $addressed_needs = $total_needs - count($unaddressed_needs);
+
+        if ($total_needs > 0) {
+            $progress_pct = round(($addressed_needs / $total_needs) * 100);
+        } else {
+            $progress_pct = 0;
+        }
+
+        $this->view('user/home', [
+            'user' => $user,
+            'activities' => array_slice($all_activities, 0, 5), // Recent 5
+            'total_count' => $total_count,
+            'approved_count' => $approved_count,
+            'progress_pct' => $progress_pct,
+            'unaddressed_needs' => $unaddressed_needs,
+            'notifications' => $notifications
         ]);
     }
 
@@ -182,9 +173,10 @@ class UserController extends Controller
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $current_rating_period = $user['rating_period'] ?? 'Not Set';
 
-            $modality = isset($_POST['modality']) ? implode(', ', $_POST['modality']) : '';
+            $modality = trim($_POST['modality'] ?? '');
             $competency = isset($_POST['competency']) ? (is_array($_POST['competency']) ? implode(', ', $_POST['competency']) : trim($_POST['competency'])) : '';
-            $type_ld = isset($_POST['type_ld']) ? implode(', ', $_POST['type_ld']) : '';
+            $type_ld = trim($_POST['type_ld'] ?? '');
+            $classification = isset($_POST['classification']) ? (is_array($_POST['classification']) ? implode(', ', $_POST['classification']) : trim($_POST['classification'])) : '';
 
             $workplace_image_path = $this->saveUpload('workplace_image', 'work', 'workplace');
             $application_file_path = $this->saveUpload('application_file', 'app_learning', 'application_files');
@@ -199,6 +191,7 @@ class UserController extends Controller
                 'competency' => $competency,
                 'type_ld' => $type_ld,
                 'type_ld_others' => trim($_POST['type_ld_others'] ?? ''),
+                'classification' => $classification,
                 'conducted_by' => '',
                 'organizer_signature_path' => '',
                 'workplace_application' => '',
@@ -212,14 +205,21 @@ class UserController extends Controller
 
             if ($this->activityRepo->createActivity($activityData)) {
                 $_SESSION['toast'] = ['title' => 'Success', 'message' => 'Activity submitted successfully!', 'type' => 'success'];
-                $this->redirect('user/home');
+                $this->redirect('user/submissions-progress');
             }
         }
 
         $user_ildns = $this->ildnRepo->getILDNList($user_id);
+        $ld_types = $this->refRepo->getAllLDTypes();
+        $modalities = $this->refRepo->getAllModalities();
+        $classifications = $this->refRepo->getAllClassifications();
+
         $this->view('user/add_activity', [
             'user' => $user,
-            'user_ildns' => $user_ildns
+            'user_ildns' => $user_ildns,
+            'ld_types' => $ld_types,
+            'modalities' => $modalities,
+            'classifications' => $classifications
         ]);
     }
 
@@ -244,9 +244,10 @@ class UserController extends Controller
         }
 
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $modality = isset($_POST['modality']) ? implode(', ', $_POST['modality']) : '';
+            $modality = trim($_POST['modality'] ?? '');
             $competency = isset($_POST['competency']) ? (is_array($_POST['competency']) ? implode(', ', $_POST['competency']) : trim($_POST['competency'])) : '';
-            $type_ld = isset($_POST['type_ld']) ? implode(', ', $_POST['type_ld']) : '';
+            $type_ld = trim($_POST['type_ld'] ?? '');
+            $classification = isset($_POST['classification']) ? (is_array($_POST['classification']) ? implode(', ', $_POST['classification']) : trim($_POST['classification'])) : '';
 
             $new_work_images = $this->saveUpload('workplace_image', 'work', 'workplace');
             $work_image_path = $new_work_images ?: $activity['workplace_image_path'];
@@ -259,6 +260,7 @@ class UserController extends Controller
                 'competency' => $competency,
                 'type_ld' => $type_ld,
                 'type_ld_others' => trim($_POST['type_ld_others'] ?? ''),
+                'classification' => $classification,
                 'conducted_by' => trim($_POST['conducted_by'] ?? ''),
                 'workplace_image_path' => $work_image_path,
                 'reflection' => trim($_POST['reflection']),
@@ -274,9 +276,16 @@ class UserController extends Controller
         }
 
         $user_ildns = $this->ildnRepo->getILDNList($activity['user_id']);
+        $ld_types = $this->refRepo->getAllLDTypes();
+        $modalities = $this->refRepo->getAllModalities();
+        $classifications = $this->refRepo->getAllClassifications();
+
         $this->view('user/edit_activity', [
             'activity' => $activity,
-            'user_ildns' => $user_ildns
+            'user_ildns' => $user_ildns,
+            'ld_types' => $ld_types,
+            'modalities' => $modalities,
+            'classifications' => $classifications
         ]);
     }
 
@@ -291,8 +300,34 @@ class UserController extends Controller
             $this->redirect('user/home');
         }
 
+        // Fetch Immediate Head Name (SDS)
+        $sdsName = 'SDS';
+        try {
+            $stmt = $this->pdo->prepare("SELECT full_name FROM users WHERE role = 'immediate_head' LIMIT 1");
+            $stmt->execute();
+            $sdsUser = $stmt->fetch(\PDO::FETCH_ASSOC);
+            if ($sdsUser && !empty($sdsUser['full_name'])) {
+                $sdsName = $sdsUser['full_name'];
+            }
+        } catch (\Exception $e) {
+        }
+
+        // Fetch Head HR Name
+        $hrName = 'HR OFFICER';
+        try {
+            $stmt = $this->pdo->prepare("SELECT full_name FROM users WHERE role = 'head_hr' LIMIT 1");
+            $stmt->execute();
+            $hrUser = $stmt->fetch(\PDO::FETCH_ASSOC);
+            if ($hrUser && !empty($hrUser['full_name'])) {
+                $hrName = $hrUser['full_name'];
+            }
+        } catch (\Exception $e) {
+        }
+
         $this->view('user/view_activity', [
-            'activity' => $activity
+            'activity' => $activity,
+            'sds_name' => $sdsName,
+            'hr_name' => $hrName
         ]);
     }
 

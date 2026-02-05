@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
     <!-- Tom Select CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+    <link rel="stylesheet" href="<?php echo PUBLIC_ROOT; ?>css/user/common_branded_header.css?v=<?php echo time(); ?>">
 </head>
 
 <body>
@@ -43,17 +44,22 @@
             </header>
 
             <main class="content-wrapper">
-                <div class="dashboard-card" style="max-width: 900px; margin: 0 auto; overflow: visible;">
+                <div class="dashboard-card"
+                    style="max-width: 900px; margin: 0 auto; overflow: hidden; border-radius: var(--radius-xl);">
+                    <!-- Activity Branded Header -->
+                    <div class="activity-branded-header">
+                        <div class="header-logo-container">
+                            <img src="<?php echo PUBLIC_ROOT; ?>assets/LogoLDP.png" alt="LDP Logo" class="branded-logo">
+                        </div>
+                        <div class="header-content">
+                            <span class="system-badge">Activity Entry</span>
+                            <h1 class="header-main-title">Learning & Development Attended</h1>
+                            <p class="header-subtitle">Schools Division Office - Official Record Form</p>
+                        </div>
+                    </div>
+
                     <div class="card-body" style="padding: 40px;">
                         <form id="activity-form" method="POST" enctype="multipart/form-data">
-
-                            <h2
-                                style="font-size: 1.5rem; font-weight: 800; color: var(--primary); text-align: center; margin-bottom: 40px; text-transform: uppercase; letter-spacing: 1px;">
-                                LEARNING AND DEVELOPMENT ATTENDED
-                                <div
-                                    style="width: 60px; height: 4px; background: var(--accent); margin: 12px auto 0; border-radius: 2px;">
-                                </div>
-                            </h2>
 
                             <!-- Section 1: Basic Information -->
                             <div class="form-section">
@@ -71,8 +77,8 @@
 
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
                                     <div class="form-group">
-                                        <label class="form-label">Date(s) Attended <span
-                                                style="color: var(--danger);">*</span></label>
+                                        <label class="form-label">Date(s) Attended <span style="color: var(--danger);"
+                                                id="req-date">*</span></label>
                                         <div class="input-group">
                                             <span class="input-group-text"
                                                 style="background: var(--bg-secondary); border-right: none;">
@@ -84,9 +90,9 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="form-label">Venue <span
-                                                style="color: var(--danger);">*</span></label>
-                                        <input type="text" name="venue" class="form-control" required
+                                        <label class="form-label">Venue <span style="color: var(--danger);"
+                                                id="req-venue">*</span></label>
+                                        <input type="text" name="venue" id="venue" class="form-control" required
                                             placeholder="e.g. SDO Conference Hall">
                                     </div>
                                 </div>
@@ -97,9 +103,22 @@
                                                 style="color: var(--danger);">*</span></label>
                                         <select id="competency_select" name="competency[]" class="form-control"
                                             placeholder="Select or type learning needs..." required multiple>
+                                            <option value="Relevant Expertise">Relevant Expertise</option>
                                             <?php foreach ($user_ildns as $ildn): ?>
                                                 <option value="<?php echo htmlspecialchars($ildn['need_text']); ?>">
                                                     <?php echo htmlspecialchars($ildn['need_text']); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Classification <span style="color: var(--danger);"
+                                                id="req-classification">*</span></label>
+                                        <select id="classification_select" name="classification[]" class="form-control"
+                                            required multiple placeholder="Select classification...">
+                                            <?php foreach ($classifications as $classItem): ?>
+                                                <option value="<?php echo htmlspecialchars($classItem['name']); ?>">
+                                                    <?php echo htmlspecialchars($classItem['name']); ?>
                                                 </option>
                                             <?php endforeach; ?>
                                         </select>
@@ -113,71 +132,35 @@
                                     <div>
                                         <div class="form-section-header">
                                             <i class="bi bi-diagram-3"></i>
-                                            <h3>Modality <span style="color: var(--danger);">*</span></h3>
+                                            <h3>Modality <span style="color: var(--danger);" id="req-modality">*</span>
+                                            </h3>
                                         </div>
-                                        <div class="checkbox-grid" style="grid-template-columns: 1fr; gap: 8px;">
-                                            <label class="checkbox-item"
-                                                style="display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px;">
-                                                <input type="checkbox" name="modality[]" value="Formal Training"
-                                                    style="margin-top: 4px;">
-                                                <span style="font-size: 0.85rem; line-height: 1.4;">Formal
-                                                    Training</span>
-                                            </label>
-                                            <label class="checkbox-item"
-                                                style="display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px;">
-                                                <input type="checkbox" name="modality[]" value="Job-Embedded Learning"
-                                                    style="margin-top: 4px;">
-                                                <span style="font-size: 0.85rem; line-height: 1.4;">Job-Embedded
-                                                    Learning</span>
-                                            </label>
-                                            <label class="checkbox-item"
-                                                style="display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px;">
-                                                <input type="checkbox" name="modality[]"
-                                                    value="Relationship Discussion Learning" style="margin-top: 4px;">
-                                                <span style="font-size: 0.85rem; line-height: 1.4;">Relationship
-                                                    Discussion Learning</span>
-                                            </label>
-                                            <label class="checkbox-item"
-                                                style="display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px;">
-                                                <input type="checkbox" name="modality[]" value="Learning Action Cell"
-                                                    style="margin-top: 4px;">
-                                                <span style="font-size: 0.85rem; line-height: 1.4;">Learning Action
-                                                    Cell</span>
-                                            </label>
-                                        </div>
+                                        <select id="modality_select" name="modality" class="form-control" required
+                                            placeholder="Select modality...">
+                                            <option value="" disabled selected>Select modality...</option>
+                                            <?php foreach ($modalities as $mod): ?>
+                                                <option value="<?php echo htmlspecialchars($mod['name']); ?>">
+                                                    <?php echo htmlspecialchars($mod['name']); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
                                     </div>
                                     <div>
                                         <div class="form-section-header">
                                             <i class="bi bi-tags"></i>
-                                            <h3>Type of L&D <span style="color: var(--danger);">*</span></h3>
+                                            <h3>Type of L&D <span style="color: var(--danger);" id="req-type">*</span>
+                                            </h3>
                                         </div>
-                                        <div class="checkbox-grid" style="grid-template-columns: 1fr; gap: 8px;">
-                                            <label class="checkbox-item"
-                                                style="display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px;">
-                                                <input type="checkbox" name="type_ld[]" value="Supervisory"
-                                                    style="margin-top: 4px;">
-                                                <span style="font-size: 0.85rem; line-height: 1.4;">Supervisory</span>
-                                            </label>
-                                            <label class="checkbox-item"
-                                                style="display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px;">
-                                                <input type="checkbox" name="type_ld[]" value="Managerial"
-                                                    style="margin-top: 4px;">
-                                                <span style="font-size: 0.85rem; line-height: 1.4;">Managerial</span>
-                                            </label>
-                                            <label class="checkbox-item"
-                                                style="display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px;">
-                                                <input type="checkbox" name="type_ld[]" value="Technical"
-                                                    style="margin-top: 4px;">
-                                                <span style="font-size: 0.85rem; line-height: 1.4;">Technical</span>
-                                            </label>
-                                            <label class="checkbox-item"
-                                                style="display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px;">
-                                                <input type="checkbox" name="type_ld[]" value="Others"
-                                                    id="type-others-checkbox" style="margin-top: 4px;">
-                                                <span style="font-size: 0.85rem; line-height: 1.4;">Others
-                                                    (Specify)</span>
-                                            </label>
-                                        </div>
+                                        <select id="type_ld_select" name="type_ld" class="form-control" required
+                                            placeholder="Select type of L&D...">
+                                            <option value="" disabled selected>Select type of L&D...</option>
+                                            <?php foreach ($ld_types as $type): ?>
+                                                <option value="<?php echo htmlspecialchars($type['name']); ?>">
+                                                    <?php echo htmlspecialchars($type['name']); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+
                                         <div id="type-others-input-container" style="display: none; margin-top: 12px;">
                                             <input type="text" name="type_ld_others" class="form-control"
                                                 placeholder="Please specify type...">
@@ -351,7 +334,7 @@
 
                                 <div class="form-group">
                                     <label class="premium-label">Evidence / Attachments <span
-                                            style="color: var(--danger);">*</span></label>
+                                            style="color: var(--danger);" id="req-workplace">*</span></label>
                                     <div class="file-drop-zone" id="drop-zone"
                                         onclick="document.getElementById('workplace_image').click()"
                                         style="padding: 20px; min-height: auto;">
@@ -362,7 +345,7 @@
                                         <input type="file" name="workplace_image[]" id="workplace_image" multiple
                                             hidden>
                                         <div id="file-list"
-                                            style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 10px;">
+                                            style="display: flex; flex-wrap: wrap; gap: 8px; justify: center; margin-top: 10px;">
                                         </div>
                                     </div>
                                 </div>
@@ -387,7 +370,7 @@
                                         <input type="file" name="application_file" id="application_file"
                                             accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" hidden>
                                         <div id="app-file-list"
-                                            style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 10px;">
+                                            style="display: flex; flex-wrap: wrap; gap: 8px; justify: center; margin-top: 10px;">
                                         </div>
                                     </div>
                                 </div>
@@ -401,8 +384,8 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label class="premium-label">Upload Certificate <span
-                                            style="color: var(--danger);">*</span></label>
+                                    <label class="premium-label">Upload Certificate <span style="color: var(--danger);"
+                                            id="req-cert">*</span></label>
                                     <div class="file-drop-zone" id="cert-drop-zone"
                                         onclick="document.getElementById('certificate_image').click()"
                                         style="padding: 20px; min-height: auto;">
@@ -413,7 +396,7 @@
                                         <input type="file" name="certificate_image" id="certificate_image"
                                             accept=".pdf,.jpg,.jpeg,.png,.webp" hidden required>
                                         <div id="cert-file-list"
-                                            style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 10px;">
+                                            style="display: flex; flex-wrap: wrap; gap: 8px; justify: center; margin-top: 10px;">
                                         </div>
                                     </div>
                                 </div>
@@ -426,8 +409,8 @@
                                     <h3>Personal Reflection</h3>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">Reflection <span
-                                            style="color: var(--danger);">*</span></label>
+                                    <label class="form-label">Reflection <span style="color: var(--danger);"
+                                            id="req-reflection">*</span></label>
                                     <textarea name="reflection" class="form-control" required style="min-height: 120px;"
                                         placeholder="Share your key takeaways and how this will improve your performance..."></textarea>
                                 </div>
@@ -477,7 +460,8 @@
     <script src="<?php echo PUBLIC_ROOT; ?>js/active-forms.js?v=<?php echo time(); ?>"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            flatpickr("#date_picker", {
+            // Initialize Flatpickr
+            const datePicker = flatpickr("#date_picker", {
                 mode: "multiple",
                 dateFormat: "Y-m-d",
                 conjunction: ", ",
@@ -486,22 +470,109 @@
                 disableMobile: "true"
             });
 
-            new TomSelect('#competency_select', {
+            // Initialize TomSelect for Competencies
+            const competencySelect = new TomSelect('#competency_select', {
                 plugins: ['remove_button'],
                 create: true,
                 persist: false,
                 placeholder: 'Select or type learning needs...',
-                maxOptions: 50
+                maxOptions: 50,
+                onChange: function (value) {
+                    checkRelevantExpertise();
+                }
             });
 
+            // Initialize TomSelect for Classification
+            const classificationSelect = new TomSelect('#classification_select', {
+                plugins: ['remove_button'],
+                create: false,
+                persist: false,
+                placeholder: 'Select classification...'
+            });
+
+            // Initialize TomSelect for Modalities
+            const modalitySelect = new TomSelect('#modality_select', {
+                create: false,
+                persist: false,
+                placeholder: 'Select modality...',
+                maxItems: 1
+            });
+
+            // Initialize TomSelect for Type of L&D
+            const typeSelect = new TomSelect('#type_ld_select', {
+                create: false,
+                persist: false,
+                placeholder: 'Select type of L&D...',
+                maxItems: 1,
+                onChange: function (value) {
+                    toggleOthersInput();
+                    saveDraft(); // Save on change
+                }
+            });
+
+            // Logic for "Relevant Expertise" Bypass
+            const checkRelevantExpertise = () => {
+                const selected = competencySelect.getValue();
+                const isRelevantExpertise = Array.isArray(selected)
+                    ? selected.includes('Relevant Expertise')
+                    : selected === 'Relevant Expertise';
+
+                const optionalFields = [
+                    { id: 'date_picker', el: document.getElementById('date_picker') },
+                    { id: 'venue', el: document.getElementById('venue') },
+                    { id: 'classification_select', el: document.getElementById('classification_select') },
+                    { id: 'modality_select', el: document.getElementById('modality_select') },
+                    { id: 'type_ld_select', el: document.getElementById('type_ld_select') },
+                    { id: 'workplace_image', el: document.getElementById('workplace_image') },
+                    { id: 'certificate_image', el: document.getElementById('certificate_image') },
+                    { id: 'reflection', el: document.querySelector('textarea[name="reflection"]') }
+                ];
+
+                const reqIndicators = {
+                    'req-date': document.getElementById('req-date'),
+                    'req-venue': document.getElementById('req-venue'),
+                    'req-classification': document.getElementById('req-classification'),
+                    'req-modality': document.getElementById('req-modality'),
+                    'req-type': document.getElementById('req-type'),
+                    'req-workplace': document.getElementById('req-workplace'),
+                    'req-cert': document.getElementById('req-cert'),
+                    'req-reflection': document.getElementById('req-reflection')
+                };
+
+                if (isRelevantExpertise) {
+                    optionalFields.forEach(field => {
+                        if (field.el) field.el.removeAttribute('required');
+                    });
+
+                    // Hide Asterisks
+                    Object.values(reqIndicators).forEach(el => { if (el) el.style.display = 'none'; });
+
+                } else {
+                    optionalFields.forEach(field => {
+                        if (field.el) field.el.setAttribute('required', 'required');
+                    });
+
+                    // Show Asterisks
+                    Object.values(reqIndicators).forEach(el => { if (el) el.style.display = 'inline'; });
+                }
+
+                saveDraft();
+            };
+
             // Logic for "Others" specify input
-            const othersCheckbox = document.getElementById('type-others-checkbox');
             const othersContainer = document.getElementById('type-others-input-container');
-            if (othersCheckbox) {
-                othersCheckbox.addEventListener('change', function () {
-                    othersContainer.style.display = this.checked ? 'block' : 'none';
-                });
-            }
+
+            // Function to toggle 'others' input visibility
+            const toggleOthersInput = () => {
+                if (othersContainer && typeSelect) {
+                    const selected = typeSelect.getValue(); // Returns array for multiple
+                    const isOthersSelected = selected === 'Others';
+                    othersContainer.style.display = isOthersSelected ? 'block' : 'none';
+                }
+            };
+
+            // Initial check
+            toggleOthersInput();
 
             // Simple File List Preview
             const setupFilePreview = (inputId, listId) => {
@@ -523,6 +594,120 @@
             setupFilePreview('workplace_image', 'file-list');
             setupFilePreview('application_file', 'app-file-list');
             setupFilePreview('certificate_image', 'cert-file-list');
+
+
+            // --- Form Persistence Logic ---
+            const form = document.getElementById('activity-form');
+            const STORAGE_KEY = 'ldp_activity_draft_v3'; // Bump version for logic change
+
+            /**
+             * Save form data to localStorage
+             */
+            const saveDraft = () => {
+                const formData = new FormData(form);
+                const draft = {};
+
+                // Convert FormData to object
+                for (const [key, value] of formData.entries()) {
+                    if (value instanceof File) continue;
+
+                    if (draft[key]) {
+                        if (!Array.isArray(draft[key])) {
+                            draft[key] = [draft[key]];
+                        }
+                        draft[key].push(value);
+                    } else {
+                        draft[key] = value;
+                    }
+                }
+
+                // We need to explicitly check multi-selects if they are empty, as FormData won't include them
+                // But TomSelect updates the underlying select, so if it has value, it's in FormData.
+                // If it's empty, it's missing. That's fine for saving.
+
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+            };
+
+            /**
+             * Restore form data from localStorage
+             */
+            const restoreDraft = () => {
+                const savedData = localStorage.getItem(STORAGE_KEY);
+                if (!savedData) return;
+
+                try {
+                    const draft = JSON.parse(savedData);
+
+                    // Restore Standard Inputs (Text, inputs)
+                    Object.keys(draft).forEach(name => {
+                        // Skip complex fields handled below
+                        if (['modality', 'type_ld', 'competency[]', 'date_attended', 'classification[]'].includes(name)) return;
+
+                        const inputs = form.querySelectorAll(`[name="${name}"]`);
+                        if (inputs.length > 0) {
+                            if (inputs[0].type !== 'file') {
+                                inputs[0].value = draft[name];
+                            }
+                        }
+                    });
+
+                    // Restore Special Components
+
+                    // 1. Flatpickr (Date)
+                    if (draft['date_attended']) {
+                        datePicker.setDate(draft['date_attended'], true);
+                    }
+
+                    // 2. TomSelect (Competency)
+                    if (draft['competency[]']) {
+                        const comps = Array.isArray(draft['competency[]']) ? draft['competency[]'] : [draft['competency[]']];
+                        comps.forEach(val => {
+                            if (!competencySelect.options[val]) {
+                                competencySelect.addOption({ value: val, text: val });
+                            }
+                        });
+                        competencySelect.setValue(comps);
+                    }
+
+                    // 3. TomSelect (Classification) - Multi
+                    if (draft['classification[]']) {
+                        const classes = Array.isArray(draft['classification[]']) ? draft['classification[]'] : [draft['classification[]']];
+                        classificationSelect.setValue(classes);
+                    }
+
+                    // 4. TomSelect (Modality) - Single
+                    if (draft['modality']) {
+                        const mod = Array.isArray(draft['modality']) ? draft['modality'][0] : draft['modality'];
+                        modalitySelect.setValue(mod);
+                    }
+
+                    // 5. TomSelect (Type of L&D) - Single
+                    if (draft['type_ld']) {
+                        const type = Array.isArray(draft['type_ld']) ? draft['type_ld'][0] : draft['type_ld'];
+                        typeSelect.setValue(type);
+                    }
+
+                    // 6. Trigger UI updates query
+                    toggleOthersInput();
+                    checkRelevantExpertise();
+
+                } catch (e) {
+                    console.error("Error restoring draft:", e);
+                }
+            };
+
+            // Event Listeners for Saving
+            form.addEventListener('input', saveDraft);
+            form.addEventListener('change', saveDraft); // Bubbles from original selects too
+
+            // Clear draft on submit
+            form.addEventListener('submit', function () {
+                localStorage.removeItem(STORAGE_KEY);
+            });
+
+            // Initial Restore
+            restoreDraft();
+
         });
     </script>
 </body>

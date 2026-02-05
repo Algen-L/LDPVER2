@@ -324,10 +324,12 @@
                             <div class="signatures-grid-view">
                                 <div class="sig-column">
                                     <div class="sig-label-box">
-                                        <p class="sig-status-text">
-                                            GOOD AS RECOMMENDED BY THIS
-                                            <?php echo $activity['recommended_at'] ? date('M d, Y', strtotime($activity['recommended_at'])) : date('M d, Y'); ?>
-                                        </p>
+                                        <?php if ($activity['recommending_asds']): ?>
+                                            <p class="sig-status-text">
+                                                GOOD AS RECOMMENDED BY THIS
+                                                <?php echo $activity['recommended_at'] ? date('M d, Y', strtotime($activity['recommended_at'])) : date('M d, Y'); ?>
+                                            </p>
+                                        <?php endif; ?>
                                     </div>
                                     <div class="sig-container-view">
                                         <?php if (!empty($activity['organizer_signature_path'])): ?>
@@ -337,15 +339,20 @@
                                     </div>
                                     <div class="sig-thick-line"></div>
                                     <div class="text-center">
-                                        <p class="head-name">Human Resource Training Officer</p>
+                                        <p class="head-name">
+                                            <?php echo htmlspecialchars($activity['conducted_by'] ?: ($hr_name ?? 'HR OFFICER')); ?>
+                                        </p>
+                                        <p class="head-role">Human Resource Training Officer</p>
                                     </div>
                                 </div>
                                 <div class="sig-column">
                                     <div class="sig-label-box">
-                                        <p class="sig-status-text">
-                                            GOOD AS APPROVED BY THIS
-                                            <?php echo $activity['approved_at'] ? date('M d, Y', strtotime($activity['approved_at'])) : date('M d, Y'); ?>
-                                        </p>
+                                        <?php if ($activity['approved_sds']): ?>
+                                            <p class="sig-status-text">
+                                                GOOD AS APPROVED BY THIS
+                                                <?php echo $activity['approved_at'] ? date('M d, Y', strtotime($activity['approved_at'])) : date('M d, Y'); ?>
+                                            </p>
+                                        <?php endif; ?>
                                     </div>
                                     <div class="sig-container-view">
                                         <?php if (!empty($activity['signature_path'])): ?>
@@ -356,9 +363,9 @@
                                     <div class="sig-thick-line"></div>
                                     <div class="text-center">
                                         <p class="head-name">
-                                            <?php echo htmlspecialchars($activity['approved_by'] ?: 'IMMEDIATE HEAD'); ?>
+                                            <?php echo htmlspecialchars($activity['approved_by'] ?: ($sds_name ?? 'SDS')); ?>
                                         </p>
-                                        <p class="head-role">IMMEDIATE HEAD</p>
+                                        <p class="head-role">Office of the Schools Division Superintendent</p>
                                     </div>
                                 </div>
                             </div>
@@ -430,10 +437,7 @@
                         <input type="hidden" name="action_approval" value="1">
                         <input type="hidden" name="stage" value="asds">
                         <input type="hidden" name="organizer_signature_data" id="organizer_signature_data_modal">
-                        <div class="mb-3">
-                            <label class="form-label">HR Training Officer Name</label>
-                            <input type="text" name="conducted_by" class="form-control" required value="<?php echo htmlspecialchars($activity['conducted_by'] ?? ''); ?>">
-                        </div>
+                        <input type="hidden" name="conducted_by" value="<?php echo htmlspecialchars($user['full_name']); ?>">
                         <div class="mb-3">
                             <label class="form-label">Upload Signature (Optional)</label>
                             <input type="file" name="organizer_sig_file" id="organizer_sig_file" class="form-control" accept="image/*">
@@ -448,8 +452,6 @@
                     const pad = initSignaturePad('org-sig-canvas-modal');
                     document.getElementById('clear-org-modal').onclick = () => pad.clear();
                     modalSubmitBtn.onclick = () => {
-                        const name = modalContent.querySelector('input[name="conducted_by"]').value.trim();
-                        if (!name) return alert('Name is required');
                         if (!pad.isEmpty()) document.getElementById('organizer_signature_data_modal').value = pad.getData();
                         document.getElementById('modal-recommend-form').submit();
                     };

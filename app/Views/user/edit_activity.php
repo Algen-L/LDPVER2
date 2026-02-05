@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+    <link rel="stylesheet" href="<?php echo PUBLIC_ROOT; ?>css/user/common_branded_header.css?v=<?php echo time(); ?>">
 </head>
 
 <body>
@@ -40,17 +41,22 @@
             </header>
 
             <main class="content-wrapper">
-                <div class="dashboard-card" style="max-width: 900px; margin: 0 auto; overflow: visible;">
+                <div class="dashboard-card"
+                    style="max-width: 900px; margin: 0 auto; overflow: hidden; border-radius: var(--radius-xl);">
+                    <!-- Activity Branded Header -->
+                    <div class="activity-branded-header">
+                        <div class="header-logo-container">
+                            <img src="<?php echo PUBLIC_ROOT; ?>assets/LogoLDP.png" alt="LDP Logo" class="branded-logo">
+                        </div>
+                        <div class="header-content">
+                            <span class="system-badge">Modify Record</span>
+                            <h1 class="header-main-title">Learning & Development Record</h1>
+                            <p class="header-subtitle">Schools Division Office - Update Activity</p>
+                        </div>
+                    </div>
+
                     <div class="card-body" style="padding: 40px;">
                         <form id="activity-form" method="POST" enctype="multipart/form-data">
-
-                            <h2
-                                style="font-size: 1.5rem; font-weight: 800; color: var(--primary); text-align: center; margin-bottom: 40px; text-transform: uppercase; letter-spacing: 1px;">
-                                EDIT LEARNING AND DEVELOPMENT RECORD
-                                <div
-                                    style="width: 60px; height: 4px; background: var(--accent); margin: 12px auto 0; border-radius: 2px;">
-                                </div>
-                            </h2>
 
                             <!-- Section 1: Basic Information -->
                             <div class="form-section">

@@ -1,0 +1,82 @@
+/* --- Activity Branded Header (Premium Design) --- */
+.activity-branded-header {
+    background: linear-gradient(135deg, #9ecdf8 0%, #005a8a 100%);
+    /* Deeper Blue Fade */
+    border-radius: 0;
+    /* Overflow hidden on card handles clipping */
+    padding: 40px 50px;
+    /* Slightly more luxurious padding */
+    margin-bottom: 0;
+    /* Flush with the card body */
+    display: flex;
+    align-items: center;
+    gap: 35px;
+    position: relative;
+    width: 100%;
+}
+
+.activity-branded-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 150px;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(15, 76, 117, 0.03));
+    pointer-events: none;
+}
+
+.header-logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 140px;
+    /* Increased to accommodate larger logo */
+    padding: 10px;
+    flex-shrink: 0;
+}
+
+.branded-logo {
+    width: 130px;
+    /* Larger Logo */
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    filter: brightness(0.85) contrast(1.1);
+    /* Making it "darker" and more defined */
+}
+
+.header-content {
+    flex: 1;
+}
+
+.system-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: var(--primary);
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 800;
+    border-radius: 30px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.header-main-title {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #ffffff;
+    margin: 0;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+}
+
+.header-subtitle {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 4px 0 0;
+    font-weight: 600;
+}

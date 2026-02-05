@@ -181,39 +181,54 @@
                                                     </div>
                                                 </td>
                                                 <td style="text-align: center;">
-                                                    <div class="approval-indicators">
-                                                        <span title="Supervisor Reviewed">
-                                                            <i class="bi bi-check-circle-fill approval-icon <?php echo $act['reviewed_by_supervisor'] ? 'text-success' : 'text-muted'; ?>"
-                                                                style="opacity: <?php echo $act['reviewed_by_supervisor'] ? '1' : '0.4'; ?>;"></i>
+                                                    <?php $isRelevantExpertise = strpos($act['competency'], 'Relevant Expertise') !== false; ?>
+                                                    <?php if ($isRelevantExpertise): ?>
+                                                        <span class="status-badge"
+                                                            style="background: #e0e7ff; color: #4338ca; border: 1px solid #c7d2fe; font-size: 0.7rem;">
+                                                            Recorded
                                                         </span>
-                                                        <span title="ASDS Recommended">
-                                                            <i class="bi bi-check-circle-fill approval-icon <?php echo $act['recommending_asds'] ? 'text-primary' : 'text-muted'; ?>"
-                                                                style="opacity: <?php echo $act['recommending_asds'] ? '1' : '0.4'; ?>;"></i>
-                                                        </span>
-                                                        <span title="SDS Approved">
-                                                            <i class="bi bi-check-circle-fill approval-icon <?php echo $act['approved_sds'] ? 'text-success' : 'text-muted'; ?>"
-                                                                style="opacity: <?php echo $act['approved_sds'] ? '1' : '0.4'; ?>;"></i>
-                                                        </span>
-                                                    </div>
+                                                    <?php else: ?>
+                                                        <div class="approval-indicators">
+                                                            <span title="Supervisor Reviewed">
+                                                                <i class="bi bi-check-circle-fill approval-icon <?php echo $act['reviewed_by_supervisor'] ? 'text-success' : 'text-muted'; ?>"
+                                                                    style="opacity: <?php echo $act['reviewed_by_supervisor'] ? '1' : '0.4'; ?>;"></i>
+                                                            </span>
+                                                            <span title="ASDS Recommended">
+                                                                <i class="bi bi-check-circle-fill approval-icon <?php echo $act['recommending_asds'] ? 'text-primary' : 'text-muted'; ?>"
+                                                                    style="opacity: <?php echo $act['recommending_asds'] ? '1' : '0.4'; ?>;"></i>
+                                                            </span>
+                                                            <span title="SDS Approved">
+                                                                <i class="bi bi-check-circle-fill approval-icon <?php echo $act['approved_sds'] ? 'text-success' : 'text-muted'; ?>"
+                                                                    style="opacity: <?php echo $act['approved_sds'] ? '1' : '0.4'; ?>;"></i>
+                                                            </span>
+                                                        </div>
+                                                    <?php endif; ?>
                                                 </td>
                                                 <td>
-                                                    <?php
-                                                    $status_class = 'status-pending';
-                                                    $label = 'Pending';
-                                                    if ($act['approved_sds']) {
-                                                        $status_class = 'status-resolved';
-                                                        $label = 'Approved';
-                                                    } elseif ($act['recommending_asds']) {
-                                                        $status_class = 'status-in_progress';
-                                                        $label = 'Recommended';
-                                                    } elseif ($act['reviewed_by_supervisor']) {
-                                                        $status_class = 'status-accepted';
-                                                        $label = 'Reviewed';
-                                                    }
-                                                    ?>
-                                                    <span class="status-badge <?php echo $status_class; ?>">
-                                                        <?php echo $label; ?>
-                                                    </span>
+                                                    <?php if ($isRelevantExpertise): ?>
+                                                        <span class="status-badge"
+                                                            style="background: #e0e7ff; color: #4338ca; border: 1px solid #c7d2fe;">
+                                                            Recorded
+                                                        </span>
+                                                    <?php else: ?>
+                                                        <?php
+                                                        $status_class = 'status-pending';
+                                                        $label = 'Pending';
+                                                        if ($act['approved_sds']) {
+                                                            $status_class = 'status-resolved';
+                                                            $label = 'Approved';
+                                                        } elseif ($act['recommending_asds']) {
+                                                            $status_class = 'status-in_progress';
+                                                            $label = 'Recommended';
+                                                        } elseif ($act['reviewed_by_supervisor']) {
+                                                            $status_class = 'status-accepted';
+                                                            $label = 'Reviewed';
+                                                        }
+                                                        ?>
+                                                        <span class="status-badge <?php echo $status_class; ?>">
+                                                            <?php echo $label; ?>
+                                                        </span>
+                                                    <?php endif; ?>
                                                 </td>
                                                 <td style="text-align: right;">
                                                     <div class="row-actions">

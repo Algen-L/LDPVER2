@@ -7,6 +7,7 @@
     <title>View Activity Details - LDP</title>
     <?php include BASE_PATH . 'includes/head.php'; ?>
     <link rel="stylesheet" href="<?php echo PUBLIC_ROOT; ?>css/user/view_activity.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="<?php echo PUBLIC_ROOT; ?>css/user/common_branded_header.css?v=<?php echo time(); ?>">
     <style>
         .view-prog-fill {
             transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
@@ -46,15 +47,6 @@
             </header>
 
             <main class="content-wrapper">
-                <!-- Branded Header for Print -->
-                <div class="print-only-header">
-                    <img src="<?php echo PUBLIC_ROOT; ?>assets/LogoLDP.png" alt="LDP Logo" class="print-logo">
-                    <div class="print-title-group">
-                        <h1>Learning & Development Passbook</h1>
-                        <p>Schools Division Office</p>
-                    </div>
-                </div>
-
                 <div class="view-layout-container">
 
                     <!-- Progress Timeline -->
@@ -133,7 +125,21 @@
                     </div>
 
                     <!-- Main Activity Details Card -->
-                    <div class="dashboard-card" style="margin-bottom: 40px;">
+                    <div class="dashboard-card"
+                        style="margin-bottom: 40px; overflow: hidden; border-radius: var(--radius-xl);">
+                        <!-- Activity Branded Header -->
+                        <div class="activity-branded-header">
+                            <div class="header-logo-container">
+                                <img src="<?php echo PUBLIC_ROOT; ?>assets/LogoLDP.png" alt="LDP Logo"
+                                    class="branded-logo">
+                            </div>
+                            <div class="header-content">
+                                <span class="system-badge">Official Record</span>
+                                <h1 class="header-main-title"><?php echo htmlspecialchars($activity['title']); ?></h1>
+                                <p class="header-subtitle">Learning & Development Passbook - Activity Details</p>
+                            </div>
+                        </div>
+
                         <div class="card-body" style="padding: 40px;">
                             <?php
                             $printStatus = 'PENDING';
@@ -149,11 +155,6 @@
                             </div>
 
                             <div class="data-section-title"><i class="bi bi-book"></i> Activity Details</div>
-
-                            <h2
-                                style="font-size: 1.5rem; font-weight: 800; color: var(--text-primary); margin-bottom: 24px;">
-                                <?php echo htmlspecialchars($activity['title']); ?>
-                            </h2>
 
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 40px;">
                                 <div class="form-group">
@@ -342,12 +343,19 @@
                                             <img src="<?php echo PUBLIC_ROOT . htmlspecialchars($activity['organizer_signature_path']); ?>"
                                                 class="signature-img" style="max-height: 100px; filter: contrast(1.2);">
                                         <?php else: ?>
-                                            <span style="color: var(--text-muted); font-style: italic;">No signature
-                                                provided</span>
+                                            <span
+                                                style="color: var(--text-muted); font-size: 0.9rem; letter-spacing: 1px; font-weight: 600;">PENDING</span>
                                         <?php endif; ?>
                                     </div>
-                                    <p style="font-size: 0.75rem; color: var(--text-muted);">Human Resource Training
-                                        Officer</p>
+                                    <div class="text-center">
+                                        <p class="head-name"
+                                            style="font-weight: 800; text-transform: uppercase; font-size: 0.9rem; margin: 0;">
+                                            <?php echo htmlspecialchars($activity['conducted_by'] ?: ($hr_name ?? 'HR OFFICER')); ?>
+                                        </p>
+                                        <p class="head-role"
+                                            style="font-size: 0.75rem; color: var(--text-muted); margin: 0;">Human
+                                            Resource Training Officer</p>
+                                    </div>
                                 </div>
                                 <div class="signature-box" style="text-align: center;">
                                     <?php if ($activity['approved_sds'] && !empty($activity['signature_path'])): ?>
@@ -363,14 +371,19 @@
                                             <img src="<?php echo PUBLIC_ROOT . htmlspecialchars($activity['signature_path']); ?>"
                                                 class="signature-img" style="max-height: 100px; filter: contrast(1.2);">
                                         <?php else: ?>
-                                            <span style="color: var(--text-muted); font-style: italic;">No signature
-                                                provided</span>
+                                            <span
+                                                style="color: var(--text-muted); font-size: 0.9rem; letter-spacing: 1px; font-weight: 600;">PENDING</span>
                                         <?php endif; ?>
                                     </div>
-                                    <p style="font-weight: 800; text-transform: uppercase; font-size: 0.9rem;">
-                                        <?php echo htmlspecialchars($activity['approved_by'] ?? 'Head of Office'); ?>
-                                    </p>
-                                    <p style="font-size: 0.75rem; color: var(--text-muted);">IMMEDIATE HEAD</p>
+                                    <div class="text-center">
+                                        <p class="head-name"
+                                            style="font-weight: 800; text-transform: uppercase; font-size: 0.9rem; margin: 0;">
+                                            <?php echo htmlspecialchars($activity['approved_by'] ?: ($sds_name ?? 'SDS')); ?>
+                                        </p>
+                                        <p class="head-role"
+                                            style="font-size: 0.75rem; color: var(--text-muted); margin: 0;">Office of
+                                            the Schools Division Superintendent</p>
+                                    </div>
                                 </div>
                             </div>
 
