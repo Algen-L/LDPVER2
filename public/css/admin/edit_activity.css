@@ -1,0 +1,139 @@
+@import url("../base/variables.css");
+
+.form-section {
+    margin-bottom: 40px;
+}
+
+.form-section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--border-light);
+}
+
+.form-section-header i {
+    font-size: 1.5rem;
+    color: var(--primary);
+}
+
+.form-section-header h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-transform: uppercase;
+}
+
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    border: 1.5px solid transparent;
+}
+
+.checkbox-item:hover {
+    background: var(--bg-tertiary);
+}
+
+.checkbox-item input:checked+span {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.prog-preview {
+    margin-bottom: 32px;
+    padding: 20px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+}
+
+.view-prog-track {
+    margin-bottom: 24px;
+    padding: 12px;
+}
+
+.view-prog-steps {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+}
+
+.view-prog-line {
+    position: absolute;
+    top: 18px;
+    left: 40px;
+    right: 40px;
+    height: 3px;
+    background: var(--bg-tertiary);
+    z-index: 1;
+}
+
+.view-prog-fill {
+    position: absolute;
+    top: 18px;
+    left: 40px;
+    height: 3px;
+    background: var(--success);
+    z-index: 2;
+}
+
+.view-prog-step {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    flex: 1;
+}
+
+.view-prog-icon {
+    width: 36px;
+    height: 36px;
+    background: white;
+    border: 3px solid var(--border-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.view-prog-step.active .view-prog-icon {
+    border-color: var(--success);
+    color: var(--success);
+    background: rgba(46, 204, 113, 0.1);
+}
+
+.view-prog-label {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+/* Page specific overrides and utilities */
+.edit-activity-container {
+    max-width: 900px;
+    margin: 0 auto;
+    overflow: visible;
+}
+
+.edit-activity-body {
+    padding: 40px;
+}
+
+.reflection-textarea {
+    min-height: 120px;
+}

@@ -1,0 +1,274 @@
+/* --- New Premium Filter Styles --- */
+.premium-filter-container {
+    background: white;
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-sm);
+}
+
+.filter-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+}
+
+/* Custom Select Component */
+.custom-select-wrapper {
+    position: relative;
+    min-width: 180px;
+}
+
+.custom-select-trigger {
+    height: 40px;
+    padding: 0 12px;
+    background: white;
+    border: 1.5px solid var(--border-color);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.custom-select-trigger:hover {
+    border-color: var(--primary);
+    background: #f8fafc;
+}
+
+.custom-select-trigger.active {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(15, 76, 117, 0.1);
+}
+
+.custom-select-text {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.custom-select-trigger i {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    transition: transform 0.3s ease;
+}
+
+.custom-select-trigger.active i {
+    transform: rotate(180deg);
+}
+
+.custom-select-options {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    width: 100%;
+    background: white;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    max-height: 250px;
+    overflow-y: auto;
+    display: none;
+    animation: dropdownFade 0.2s ease-out;
+}
+
+@keyframes dropdownFade {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.custom-select-options.show {
+    display: block;
+}
+
+.custom-option {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.custom-option:hover {
+    background: #f1f5f9;
+    color: var(--primary);
+}
+
+.custom-option.selected {
+    background: rgba(15, 76, 117, 0.05);
+    color: var(--primary);
+    font-weight: 600;
+}
+
+/* Date Picker Range */
+.date-range-pills {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #f8fafc;
+    padding: 0 10px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border-color);
+    height: 40px;
+}
+
+.date-range-pills i {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.date-pill-input {
+    border: none;
+    background: transparent;
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    font-weight: 600;
+    outline: none;
+    width: 95px;
+}
+
+/* Action Buttons */
+.apply-btn {
+    height: 40px;
+    padding: 0 16px;
+    background: linear-gradient(135deg, #0f4c75 0%, #1b6ca8 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.82rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.apply-btn:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+.reset-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: white;
+    border: 1.5px solid var(--border-color);
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.reset-btn:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+    background: #fee2e2;
+}
+
+/* Activity List Density */
+.activity-logs-scroll-container {
+    max-height: calc(100vh - 320px);
+    min-height: 400px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+}
+
+.activity-logs-scroll-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.activity-logs-scroll-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.activity-logs-scroll-container::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 10px;
+}
+
+.activity-item {
+    padding: 12px 16px;
+}
+
+.activity-user {
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.activity-time {
+    font-size: 0.72rem;
+}
+
+.activity-desc {
+    font-size: 0.8rem;
+}
+
+.log-type-update {
+    border-left: 3px solid #ff9800;
+    background: #fff3e0;
+}
+
+.log-type-review {
+    border-left: 3px solid #4caf50;
+    background: #e8f5e9;
+}
+
+.log-type-recommend {
+    border-left: 3px solid #2196f3;
+    background: #e3f2fd;
+}
+
+.log-type-approve {
+    border-left: 3px solid #9c27b0;
+    background: #f3e5f5;
+}
+
+.log-type-user-mgmt {
+    border-left: 3px solid #607d8b;
+    background: #eceff1;
+}
+
+.log-type-update .activity-icon {
+    background-color: #ffe0b2;
+    color: #ef6c00;
+}
+
+.log-type-review .activity-icon {
+    background-color: #c8e6c9;
+    color: #2e7d32;
+}
+
+.log-type-recommend .activity-icon {
+    background-color: #bbdefb;
+    color: #1565c0;
+}
+
+.log-type-approve .activity-icon {
+    background-color: #e1bee7;
+    color: #7b1fa2;
+}
+
+.log-type-update .activity-desc strong {
+    color: #ef6c00 !important;
+}

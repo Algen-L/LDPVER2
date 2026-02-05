@@ -1,0 +1,410 @@
+/* Login Page Styles - Dark Premium Design */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --bg-dark: #0f172a;
+    --card-bg: #1e293b;
+    --input-bg: #0f172a;
+    --border-color: #334155;
+    --primary-blue: #0ea5e9;
+    --primary-hover: #0284c7;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+}
+
+body.auth-page {
+    background-color: var(--bg-dark);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Back to center for better look */
+    margin: 0;
+    padding: 20px;
+    /* Reduced vertical padding */
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Animated Grid Background */
+.grid-background {
+    position: fixed;
+    top: -10px;
+    left: -10px;
+    width: calc(100% + 20px);
+    height: calc(100% + 20px);
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    grid-template-rows: repeat(auto-fit, minmax(90px, 1fr));
+    gap: 2px;
+    background: #0f172a;
+}
+
+.grid-tile {
+    background: #1a2332;
+    transition: all 1.2s ease;
+    border-radius: 0;
+}
+
+.grid-tile.active {
+    background: linear-gradient(135deg, #1e3a8a, #1e40af);
+    box-shadow: 0 0 25px rgba(30, 58, 138, 0.6);
+    transform: scale(1.05);
+}
+
+.grid-tile.glow {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+}
+
+
+.login-container {
+    background-color: var(--card-bg);
+    width: 400px;
+    /* Slimmer login */
+    max-width: 100%;
+    padding: 30px;
+    /* Reduced padding */
+    border-radius: 20px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    z-index: 10;
+}
+
+/* Registration Mode Specific Compactness */
+.register-mode {
+    padding-top: 20px !important;
+    padding-bottom: 20px !important;
+}
+
+.register-mode .logo-container {
+    width: 60px !important;
+    height: 60px !important;
+    margin-bottom: 8px !important;
+}
+
+.register-mode .header {
+    margin-bottom: 16px !important;
+}
+
+.register-mode .form-group {
+    margin-bottom: 6px !important;
+}
+
+.register-mode .footer-text {
+    margin-top: 5px !important;
+}
+
+.register-mode .header h1 {
+    font-size: 1rem !important;
+    margin-bottom: 2px !important;
+}
+
+.register-mode .header p {
+    font-size: 0.7rem !important;
+}
+
+.register-mode .form-control {
+    padding: 6px 12px !important;
+    height: 34px !important;
+    font-size: 0.85rem !important;
+}
+
+.register-mode .ts-control {
+    min-height: 34px !important;
+    padding: 2px 12px !important;
+}
+
+.register-mode .btn {
+    padding: 8px !important;
+    font-size: 0.85rem !important;
+}
+
+/* Header */
+.header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.logo-container {
+    width: 80px;
+    /* Much smaller logo */
+    height: 80px;
+    margin: 0 auto 12px;
+}
+
+.logo-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.header h1 {
+    color: var(--text-main);
+    font-size: 1.15rem;
+    /* Slightly smaller title */
+    font-weight: 700;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+}
+
+.header p {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    /* Smaller subtitle */
+    margin: 0;
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 14px;
+    /* Reduced spacing */
+}
+
+.form-group label {
+    display: block;
+    color: var(--text-main);
+    font-size: 0.75rem;
+    /* Even smaller labels for space */
+    font-weight: 600;
+    margin-bottom: 4px;
+    text-align: left;
+}
+
+.form-control {
+    width: 100%;
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 14px;
+    /* Slimmer inputs */
+    color: var(--text-main);
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    box-sizing: border-box;
+}
+
+.form-control::placeholder {
+    color: var(--text-muted);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+}
+
+/* Button */
+.btn {
+    width: 100%;
+    background-color: var(--primary-blue);
+    color: white;
+    border: none;
+    padding: 12px;
+    /* Slimmer button */
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 4px;
+}
+
+.btn:hover {
+    background-color: var(--primary-hover);
+}
+
+/* Additional Links */
+.footer-text {
+    text-align: center;
+    margin-top: 15px;
+    /* Reduced margin */
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+
+.alert-error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Added from index.php internal styles */
+.login-container {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.login-container.register-mode {
+    width: 780px;
+}
+
+.form-section {
+    display: none;
+}
+
+.form-section.active {
+    display: block;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.form-grid.grid-3 {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+}
+
+.toggle-link {
+    color: var(--primary-blue);
+    cursor: pointer;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.toggle-link:hover {
+    text-decoration: underline;
+}
+
+/* Simplified Office Dropdown Design (Tom Select) */
+.ts-wrapper.form-control {
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    height: auto !important;
+}
+
+.ts-control {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 2px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 12px !important;
+    padding: 12px 16px !important;
+    color: var(--text-main) !important;
+    font-family: inherit !important;
+    font-size: 0.95rem !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+    min-height: 48px !important;
+}
+
+.ts-control:hover {
+    border-color: rgba(59, 130, 246, 0.4) !important;
+    background: rgba(59, 130, 246, 0.05) !important;
+}
+
+.ts-control:focus,
+.ts-control.focus {
+    border-color: rgba(59, 130, 246, 0.6) !important;
+    background: rgba(59, 130, 246, 0.08) !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+    outline: none !important;
+}
+
+.ts-control input {
+    color: var(--text-main) !important;
+    font-weight: 500 !important;
+}
+
+.ts-control input::placeholder {
+    color: rgba(148, 163, 184, 0.5) !important;
+}
+
+.ts-dropdown {
+    background: rgba(15, 23, 42, 0.95) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(59, 130, 246, 0.2) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3) !important;
+    margin-top: 6px !important;
+    padding: 8px !important;
+    z-index: 2000 !important;
+}
+
+.ts-dropdown .optgroup-header {
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    font-size: 0.7rem !important;
+    letter-spacing: 0.08em !important;
+    padding: 10px 12px 6px !important;
+    margin-top: 6px !important;
+    background: rgba(59, 130, 246, 0.1) !important;
+    border-radius: 8px !important;
+    border-left: 3px solid #3b82f6 !important;
+    color: #60a5fa !important;
+}
+
+.ts-dropdown .option {
+    padding: 10px 12px !important;
+    border-radius: 8px !important;
+    font-size: 0.9rem !important;
+    color: rgba(226, 232, 240, 0.85) !important;
+    font-weight: 500 !important;
+    margin: 2px 0 !important;
+    transition: all 0.15s ease !important;
+    cursor: pointer !important;
+}
+
+.ts-dropdown .option:hover {
+    background: rgba(59, 130, 246, 0.15) !important;
+    color: #ffffff !important;
+}
+
+.ts-dropdown .option.active {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+.ts-dropdown-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.ts-dropdown-content::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.3);
+    border-radius: 10px;
+}
+
+.ts-dropdown-content::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.5);
+    border-radius: 10px;
+}
+
+/* Classes for inline styles from index.php */
+.alert-success {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.required-asterisk {
+    color: #ef4444;
+}
+
+.span-2 {
+    grid-column: span 2;
+}
+
+.auth-footer {
+    margin-top: 20px;
+}
+
+.dev-info {
+    font-size: 0.8em;
+    opacity: 0.5;
+}

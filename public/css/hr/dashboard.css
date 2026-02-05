@@ -1,0 +1,130 @@
+/* HR Dashboard Styles */
+
+.hr-profile-role {
+    font-size: 0.9rem;
+    color: #64748b;
+    font-weight: 600;
+    margin-top: -8px;
+}
+
+.progress-label-flex {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.completion-pct {
+    color: var(--primary);
+    font-weight: 800;
+}
+
+.progress-bar-container {
+    height: 8px;
+    background: #f1f5f9;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-bar-inner {
+    height: 100%;
+    border-radius: 4px;
+    background: var(--success);
+    transition: width 0.6s ease;
+}
+
+.profile-info-divider {
+    border-top: 1px solid var(--border-light);
+    padding-top: 12px;
+}
+
+.icon-warning-bg {
+    background: var(--warning-bg);
+    color: var(--warning);
+}
+
+.icon-info-bg {
+    background: #e0f2fe;
+    color: #0ea5e9;
+}
+
+.icon-success-bg {
+    background: var(--success-bg);
+    color: var(--success);
+}
+
+.icon-danger-bg {
+    background: #fff1f2;
+    color: #ef4444;
+}
+
+.needs-list-container {
+    font-size: 0.8rem;
+    line-height: 1.4;
+    margin-top: 4px;
+}
+
+.needs-list-styled {
+    margin: 0;
+    padding-left: 14px;
+    color: #ef4444;
+    font-weight: 700;
+}
+
+.needs-all-addressed {
+    color: var(--success);
+    font-weight: 800;
+}
+
+.activity-list-card-body {
+    padding: 0;
+}
+
+.activity-list-scroll {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.activity-meta-flex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 6px;
+}
+
+.competency-text {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.status-dot-icon {
+    font-size: 0.4rem;
+    margin-right: 4px;
+}
+
+.empty-activity-state {
+    text-align: center;
+    padding: 60px;
+    color: var(--text-muted);
+}
+
+.empty-activity-icon {
+    font-size: 3rem;
+    opacity: 0.3;
+}
+
+.empty-activity-text {
+    margin-top: 15px;
+    font-weight: 500;
+}
+
+.view-history-link {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-decoration: none;
+}

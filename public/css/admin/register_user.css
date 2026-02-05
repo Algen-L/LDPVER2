@@ -1,0 +1,247 @@
+@import url("../base/variables.css");
+
+.register-container {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 20px;
+    align-items: start;
+    max-width: 1300px;
+    margin: 0 auto;
+}
+
+.register-card {
+    background: white;
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+}
+
+.card-header-custom {
+    padding: 12px 24px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.card-header-custom h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.card-header-primary {
+    background: linear-gradient(135deg, #0f4c75 0%, #3282b8 100%);
+    color: white;
+    border: none;
+}
+
+.card-header-primary h2 {
+    color: white;
+}
+
+.card-body-custom {
+    padding: 20px 24px;
+}
+
+.form-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-control,
+.form-select {
+    height: 38px;
+    border-radius: 10px;
+    border: 1.5px solid #e2e8f0;
+    padding: 0 14px;
+    font-size: 0.88rem;
+    color: #1e293b;
+    transition: all 0.2s;
+    background: #f8fafc;
+}
+
+.form-control:focus,
+.form-select:focus {
+    background: white;
+    border-color: #3282b8;
+    box-shadow: 0 0 0 3px rgba(50, 130, 184, 0.1);
+    outline: none;
+}
+
+.form-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.form-section-header {
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    margin-top: 4px;
+}
+
+.form-section-header::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #f1f5f9;
+}
+
+.profile-upload-zone {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15, 76, 117, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    opacity: 0;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    z-index: 10;
+    backdrop-filter: blur(4px);
+}
+
+.d-none {
+    display: none !important;
+}
+
+.avatar-wrapper:hover .profile-upload-zone {
+    opacity: 1;
+}
+
+.input-group {
+    display: flex;
+    width: 100%;
+}
+
+.input-group-text {
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    border-radius: 10px 0 0 10px;
+    color: white;
+    padding: 0 14px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.input-group .form-control {
+    flex: 1;
+    border-radius: 0 10px 10px 0;
+}
+
+/* Accent Card Styles */
+.register-card-accent {
+    background: linear-gradient(135deg, #0f4c75 0%, #3282b8 100%);
+    color: white;
+}
+
+.register-card-header-accent {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.avatar-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.upload-icon {
+    font-size: 1.2rem;
+}
+
+.preview-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    display: block;
+    background: #f1f5f9;
+}
+
+.upload-hint {
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+    font-size: 0.72rem;
+}
+
+.label-accent {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.select-accent {
+    border: none !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: white !important;
+    border-radius: 10px !important;
+    height: 42px !important;
+    font-weight: 600 !important;
+    font-size: 0.88rem !important;
+}
+
+.select-accent option {
+    color: #334155;
+}
+
+.input-accent {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: none !important;
+    color: white !important;
+    height: 38px !important;
+    font-size: 0.88rem !important;
+}
+
+.btn-register {
+    background: white !important;
+    color: #0f4c75 !important;
+    border: none !important;
+    width: 100% !important;
+    border-radius: 12px !important;
+    height: 48px !important;
+    font-weight: 800 !important;
+    font-size: 0.9rem !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+@media (max-width: 1200px) {
+    .register-container {
+        grid-template-columns: 1fr;
+        max-width: 800px;
+    }
+}
+
+@media (max-width: 768px) {
+    .form-grid-2 {
+        grid-template-columns: 1fr;
+    }
+
+    .content-wrapper {
+        padding: 16px;
+    }
+}
