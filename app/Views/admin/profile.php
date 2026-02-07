@@ -249,7 +249,7 @@
                                 </div>
                             </div>
 
-                            <?php if (empty($user['rating_period'])): ?>
+                            <?php if (empty($user['rating_period']) && $_SESSION['role'] === 'immediate_head'): ?>
                                 <div class="rating-period-alert" id="ratingPeriodAlert">
                                     <div class="alert-content">
                                         <div class="alert-icon-box">

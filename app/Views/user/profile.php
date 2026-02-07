@@ -982,18 +982,25 @@
                                     <?php foreach ($activities as $act): ?>
                                         <?php
                                         $hasCert = !empty($act['certificate_path']);
+                                        $isRelevantExpertise = strpos($act['competency'], 'Relevant Expertise') !== false;
                                         ?>
                                         <div class="activity-card"
                                             data-title="<?php echo strtolower(htmlspecialchars($act['title'])); ?>"
                                             data-date="<?php echo strtotime($act['created_at']); ?>"
-                                            style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 14px; transition: all 0.2s ease;">
+                                            style="background: white; border: 1px solid <?php echo $isRelevantExpertise ? '#c7d2fe' : '#e2e8f0'; ?>; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 14px; transition: all 0.2s ease;">
 
                                             <!-- Activity Type Badge -->
-                                            <div style="display: inline-block; align-self: flex-start;">
+                                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                                                 <span
                                                     style="background: var(--primary); color: white; padding: 5px 14px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">
                                                     <?php echo htmlspecialchars($act['type'] ?? 'SUPERVISORY'); ?>
                                                 </span>
+                                                <?php if ($isRelevantExpertise): ?>
+                                                    <span
+                                                        style="background: #e0e7ff; color: #4338ca; padding: 5px 14px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 4px;">
+                                                        <i class="bi bi-bookmark-star-fill"></i> RECORDED ENTRY
+                                                    </span>
+                                                <?php endif; ?>
                                             </div>
 
                                             <!-- Title -->

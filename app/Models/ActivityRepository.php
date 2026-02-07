@@ -192,9 +192,9 @@ class ActivityRepository
             if ($filters['filter_type'] === 'today') {
                 $sql .= " AND DATE(ld.created_at) = CURDATE()";
             } elseif ($filters['filter_type'] === 'week') {
-                $sql .= " AND ld.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)";
+                $sql .= " AND YEARWEEK(ld.created_at, 0) = YEARWEEK(CURDATE(), 0)";
             } elseif ($filters['filter_type'] === 'month') {
-                $sql .= " AND ld.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
+                $sql .= " AND YEAR(ld.created_at) = YEAR(CURDATE()) AND MONTH(ld.created_at) = MONTH(CURDATE())";
             } elseif ($filters['filter_type'] === 'year') {
                 $sql .= " AND ld.created_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)";
             }

@@ -197,9 +197,9 @@ class AdminController extends Controller
                 if ($filter === 'today') {
                     $date_filter_sql = "AND DATE(created_at) = CURRENT_DATE";
                 } elseif ($filter === 'week') {
-                    $date_filter_sql = "AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)";
+                    $date_filter_sql = "AND YEARWEEK(created_at, 0) = YEARWEEK(CURDATE(), 0)";
                 } elseif ($filter === 'month') {
-                    $date_filter_sql = "AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
+                    $date_filter_sql = "AND YEAR(created_at) = YEAR(CURDATE()) AND MONTH(created_at) = MONTH(CURDATE())";
                 } elseif ($filter === 'custom' && $date_from && $date_to) {
                     $date_filter_sql = "AND DATE(created_at) BETWEEN ? AND ?";
                     $date_params = [$date_from, $date_to];
@@ -1073,15 +1073,22 @@ class AdminController extends Controller
             $title = trim($_POST['title']);
             $date_attended = trim($_POST['date_attended'] ?? '');
             $venue = trim($_POST['venue']);
-            $modality = isset($_POST['modality']) ? implode(', ', $_POST['modality']) : '';
+            $modality = trim($_POST['modality'] ?? '');
             $competency = isset($_POST['competency']) ? (is_array($_POST['competency']) ? implode(', ', $_POST['competency']) : trim($_POST['competency'])) : '';
-            $type_ld = isset($_POST['type_ld']) ? implode(', ', $_POST['type_ld']) : '';
+            $type_ld = trim($_POST['type_ld'] ?? '');
             $type_ld_others = trim($_POST['type_ld_others'] ?? '');
-            $conducted_by = trim($_POST['conducted_by']);
+            $classification = isset($_POST['classification']) ? (is_array($_POST['classification']) ? implode(', ', $_POST['classification']) : trim($_POST['classification'])) : '';
+            $conducted_by = trim($_POST['conducted_by'] ?? '');
             $reflection = trim($_POST['reflection']);
 
             $new_work_images = saveUpload('workplace_image', 'work', 'workplace');
             $work_image_path = $new_work_images ?: $activity['workplace_image_path'];
+
+            $new_app_files = saveUpload('application_file', 'app_learning', 'application_files');
+            $application_file_path = $new_app_files ?: $activity['application_file_path'];
+
+            $new_cert_files = saveUpload('certificate_image', 'cert', 'certificates');
+            $certificate_path = $new_cert_files ?: $activity['certificate_path'];
 
             $updateData = [
                 'title' => $title,
@@ -1091,8 +1098,11 @@ class AdminController extends Controller
                 'competency' => $competency,
                 'type_ld' => $type_ld,
                 'type_ld_others' => $type_ld_others,
+                'classification' => $classification,
                 'conducted_by' => $conducted_by,
                 'workplace_image_path' => $work_image_path,
+                'application_file_path' => $application_file_path,
+                'certificate_path' => $certificate_path,
                 'reflection' => $reflection,
                 'rating_period' => $activity['rating_period']
             ];

@@ -221,7 +221,7 @@ if (isset($_SESSION['user_id']) && isset($notifRepo)) {
                     </div>
                     <span class="nav-text">My Submissions</span>
                 </a>
-                <?php endif; // End HR activity links check ?>
+            <?php endif; // End HR activity links check ?>
 
             <div class="nav-divider"></div>
 
@@ -248,7 +248,18 @@ if (isset($_SESSION['user_id']) && isset($notifRepo)) {
     </div>
 
     <div class="sidebar-footer">
-        <a href="<?php echo $route_prefix; ?>admin/profile" class="user-info-link">
+        <?php
+        // Determine correct profile link based on role
+        $profile_link = $route_prefix;
+        if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'super_admin' || $_SESSION['role'] === 'immediate_head' || $_SESSION['role'] === 'head_hr') {
+            $profile_link .= 'admin/profile';
+        } elseif ($_SESSION['role'] === 'hr') {
+            $profile_link .= 'hr/profile';
+        } else {
+            $profile_link .= 'user/profile';
+        }
+        ?>
+        <a href="<?php echo $profile_link; ?>" class="user-info-link">
             <div class="user-info">
                 <?php
                 // Use $user if available (from parent script), otherwise use session
@@ -257,17 +268,17 @@ if (isset($_SESSION['user_id']) && isset($notifRepo)) {
                 $display_role = isset($user['position']) ? $user['position'] : (isset($_SESSION['position']) ? $_SESSION['position'] : 'Employee');
                 ?>
                 <?php if (!empty($display_pic)): ?>
-                    <img src="<?php echo $to_public . htmlspecialchars($display_pic); ?>" alt="User" class="user-avatar">
-                <?php else: ?>
-                    <div class="user-avatar-placeholder">
-                        <?php echo strtoupper(substr($display_name ?: $_SESSION['username'], 0, 1)); ?>
+                        <img src="<?php echo $to_public . htmlspecialchars($display_pic); ?>" alt="User" class="user-avatar">
+                    <?php else: ?>
+                            <div class="user-avatar-placeholder">
+                                <?php echo strtoupper(substr($display_name ?: $_SESSION['username'], 0, 1)); ?>
+                            </div>
+                    <?php endif; ?>
+                    <div class="user-details">
+                        <span class="user-name"><?php echo htmlspecialchars($display_name); ?></span>
+                        <span class="user-role"><?php echo htmlspecialchars($display_role); ?></span>
                     </div>
-                <?php endif; ?>
-                <div class="user-details">
-                    <span class="user-name"><?php echo htmlspecialchars($display_name); ?></span>
-                    <span class="user-role"><?php echo htmlspecialchars($display_role); ?></span>
                 </div>
-            </div>
         </a>
         <a href="<?php echo $to_root; ?>includes/logout.php" class="logout-btn-new" title="Log out">
             <i class="bi bi-power"></i>

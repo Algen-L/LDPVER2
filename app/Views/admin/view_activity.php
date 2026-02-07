@@ -11,6 +11,7 @@
     <title>View Activity Details - Admin</title>
     <?php require BASE_PATH . 'includes/admin_head.php'; ?>
     <link rel="stylesheet" href="<?php echo PUBLIC_ROOT; ?>css/admin/view_activity.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="<?php echo PUBLIC_ROOT; ?>css/user/common_branded_header.css?v=<?php echo time(); ?>">
 </head>
 
 <body>
@@ -124,31 +125,39 @@
                         </div>
                     </div>
 
-                    <div class="submitter-hero">
-                        <?php if (!empty($activity['profile_picture'])): ?>
-                            <img src="<?php echo PUBLIC_ROOT . $activity['profile_picture']; ?>" class="submitter-avatar">
-                        <?php else: ?>
-                            <div class="submitter-avatar-placeholder">
-                                <?php echo strtoupper(substr($activity['full_name'], 0, 1)); ?>
+
+                    <div class="dashboard-card mb-40" style="overflow: hidden; border-radius: var(--radius-xl);">
+                        <!-- Activity Branded Header -->
+                        <div class="activity-branded-header">
+                            <div class="header-logo-container">
+                                <img src="<?php echo PUBLIC_ROOT; ?>assets/LogoLDP.png" alt="LDP Logo"
+                                    class="branded-logo">
                             </div>
-                        <?php endif; ?>
-                        <div class="submitter-info">
-                            <p>Activity Submitted By</p>
-                            <h2>
-                                <?php echo htmlspecialchars($activity['full_name']); ?>
-                            </h2>
-                            <div class="hero-meta">
-                                <span><i class="bi bi-building"></i>
-                                    <?php echo htmlspecialchars($activity['office_station']); ?>
-                                </span>
-                                <span><i class="bi bi-briefcase"></i>
-                                    <?php echo htmlspecialchars($activity['user_position'] ?: 'Employee'); ?>
-                                </span>
+                            <div class="header-content">
+                                <span class="system-badge">Admin Review</span>
+                                <h1 class="header-main-title"><?php echo htmlspecialchars($activity['title']); ?></h1>
+                                <p class="header-subtitle">Schools Division Office - Activity Validation</p>
+                            </div>
+                            <!-- Integrated Submitter Info -->
+                            <div class="submitter-mini-profile"
+                                style="display: flex; align-items: center; gap: 15px; padding-left: 25px; border-left: 1px solid rgba(255,255,255,0.2);">
+                                <?php if (!empty($activity['profile_picture'])): ?>
+                                    <img src="<?php echo PUBLIC_ROOT . $activity['profile_picture']; ?>"
+                                        style="width: 50px; height: 50px; border-radius: 12px; object-fit: cover; border: 2px solid rgba(255,255,255,0.3);">
+                                <?php else: ?>
+                                    <div
+                                        style="width: 50px; height: 50px; border-radius: 12px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; border: 2px solid rgba(255,255,255,0.3);">
+                                        <?php echo strtoupper(substr($activity['full_name'], 0, 1)); ?>
+                                    </div>
+                                <?php endif; ?>
+                                <div style="color: white;">
+                                    <p style="margin: 0; font-size: 0.75rem; opacity: 0.8; font-weight: 600;">Submitted
+                                        By</p>
+                                    <p style="margin: 0; font-size: 1rem; font-weight: 800;">
+                                        <?php echo htmlspecialchars($activity['full_name']); ?></p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="dashboard-card mb-40">
                         <div class="card-body p-40">
                             <?php
                             $statusClass = 'status-badge-pending';

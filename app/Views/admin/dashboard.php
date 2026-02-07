@@ -361,8 +361,13 @@
                                                         $feed_class = 'cid';
                                                     elseif ($f_cat === 'SGOD')
                                                         $feed_class = 'sgod';
+
+                                                    $isRelevantExpertise = !empty($act['competency']) && strpos($act['competency'], 'Relevant Expertise') !== false;
+                                                    $expertStyle = $isRelevantExpertise ? 'border: 2px solid #c7d2fe; position: relative;' : '';
                                                     ?>
-                                                        <a href="<?php echo PUBLIC_ROOT; ?>index.php/admin/view-activity?id=<?php echo $act['id']; ?>" class="feed-item <?php echo $feed_class; ?>">
+                                                        <a href="<?php echo PUBLIC_ROOT; ?>index.php/admin/view-activity?id=<?php echo $act['id']; ?>" 
+                                                           class="feed-item <?php echo $feed_class; ?>"
+                                                           style="<?php echo $expertStyle; ?>">
                                                             <?php if ($act['profile_picture']): ?>
                                                                     <img src="<?php echo PUBLIC_ROOT . $act['profile_picture']; ?>" class="feed-avatar">
                                                             <?php else: ?>
@@ -372,7 +377,14 @@
                                                             <?php endif; ?>
                                                             <div class="feed-info">
                                                                 <span class="feed-user"><?php echo htmlspecialchars($act['full_name']); ?></span>
-                                                                <span class="feed-activity text-truncate feed-activity-constraint"><?php echo htmlspecialchars($act['title']); ?></span>
+                                                                <span class="feed-activity text-truncate feed-activity-constraint">
+                                                                    <?php echo htmlspecialchars($act['title']); ?>
+                                                                </span>
+                                                                <?php if ($isRelevantExpertise): ?>
+                                                                    <span style="display: inline-flex; align-items: center; gap: 4px; background: #e0e7ff; color: #4338ca; padding: 1px 6px; border-radius: 4px; font-size: 0.55rem; font-weight: 800; text-transform: uppercase; margin-top: 2px;">
+                                                                        <i class="bi bi-bookmark-star-fill"></i> RECORDED
+                                                                    </span>
+                                                                <?php endif; ?>
                                                             </div>
                                                             <div class="feed-time">
                                                                 <?php echo time_elapsed_string($act['activity_created_at'] ?? $act['created_at']); ?>
@@ -418,10 +430,21 @@
                                                                 $s_label = 'Reviewed';
                                                             }
                                                             ?>
-                                                                <tr>
+                                                                <?php
+                                                                $isRelevantExpertise = !empty($act['competency']) && strpos($act['competency'], 'Relevant Expertise') !== false;
+                                                                $rowStyle = $isRelevantExpertise ? 'border: 2px solid #c7d2fe; border-radius: 8px;' : '';
+                                                                ?>
+                                                                <tr style="<?php echo $rowStyle; ?>">
                                                                     <td><?php echo date('M d, Y', strtotime($act['activity_created_at'] ?? $act['created_at'])); ?></td>
                                                                     <td><strong><?php echo htmlspecialchars($act['full_name']); ?></strong><br><small><?php echo htmlspecialchars($act['office_station']); ?></small></td>
-                                                                    <td><span class="text-truncate d-block activity-desc-constraint"><?php echo htmlspecialchars($act['title']); ?></span></td>
+                                                                    <td>
+                                                                        <span class="text-truncate d-block activity-desc-constraint"><?php echo htmlspecialchars($act['title']); ?></span>
+                                                                        <?php if ($isRelevantExpertise): ?>
+                                                                            <span style="display: inline-flex; align-items: center; gap: 4px; background: #e0e7ff; color: #4338ca; padding: 2px 8px; border-radius: 4px; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; margin-top: 4px;">
+                                                                                <i class="bi bi-bookmark-star-fill"></i> RECORDED ENTRY
+                                                                            </span>
+                                                                        <?php endif; ?>
+                                                                    </td>
                                                                     <td><span class="status-badge <?php echo $s_class; ?>"><?php echo $s_label; ?></span></td>
                                                                 </tr>
                                                         <?php endforeach; ?>

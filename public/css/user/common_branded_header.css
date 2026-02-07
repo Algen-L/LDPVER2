@@ -4,8 +4,8 @@
     /* Deeper Blue Fade */
     border-radius: 0;
     /* Overflow hidden on card handles clipping */
-    padding: 40px 50px;
-    /* Slightly more luxurious padding */
+    padding: 24px 50px;
+    /* More compact vertical height */
     margin-bottom: 0;
     /* Flush with the card body */
     display: flex;
@@ -79,4 +79,49 @@
     color: rgba(255, 255, 255, 0.85);
     margin: 4px 0 0;
     font-weight: 600;
+}
+
+/* --- Form Sections & Alignment --- */
+.form-section {
+    margin-bottom: 40px;
+    padding-bottom: 10px;
+}
+
+.form-section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--border-light);
+}
+
+.form-section-header i {
+    font-size: 1.5rem;
+    color: var(--primary);
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    margin-top: -2px;
+    /* Fine-tune optical alignment */
+}
+
+.form-section-header h3 {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+/* Ensure spacing between form groups */
+.form-group {
+    margin-bottom: 24px !important;
+}
+
+.form-label {
+    margin-bottom: 10px !important;
+    font-weight: 700 !important;
 }

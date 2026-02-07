@@ -101,28 +101,6 @@
                         </div>
                     </div>
 
-                    <div class="submitter-hero">
-                        <?php if (!empty($activity['profile_picture'])): ?>
-                            <img src="<?php echo PUBLIC_ROOT . htmlspecialchars($activity['profile_picture']); ?>"
-                                class="submitter-avatar">
-                        <?php else: ?>
-                            <div class="submitter-avatar"
-                                style="background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 800; color: var(--text-muted);">
-                                <?php echo strtoupper(substr($activity['full_name'] ?? 'U', 0, 1)); ?>
-                            </div>
-                        <?php endif; ?>
-                        <div class="submitter-info">
-                            <p>Activity Submitted By</p>
-                            <h2><?php echo htmlspecialchars($activity['full_name'] ?? 'Unknown User'); ?></h2>
-                            <div
-                                style="display: flex; gap: 16px; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">
-                                <span><i class="bi bi-building"></i>
-                                    <?php echo htmlspecialchars($activity['office_station'] ?? 'N/A'); ?></span>
-                                <span><i class="bi bi-briefcase"></i>
-                                    <?php echo htmlspecialchars($activity['user_position'] ?? 'Employee'); ?></span>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Main Activity Details Card -->
                     <div class="dashboard-card"
@@ -182,13 +160,6 @@
                                     <div class="form-control"
                                         style="background: var(--bg-secondary); font-weight: 600;">
                                         <?php echo htmlspecialchars($activity['competency']); ?>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Conducted By</label>
-                                    <div class="form-control"
-                                        style="background: var(--bg-secondary); font-weight: 600;">
-                                        <?php echo htmlspecialchars($activity['conducted_by']); ?>
                                     </div>
                                 </div>
                             </div>

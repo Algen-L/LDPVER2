@@ -435,20 +435,31 @@
                                 else if (s.reviewed_by_supervisor == 1) statusTag = '<span class="submission-status-tag status-tag-reviewed">Reviewed</span>';
                                 else statusTag = '<span class="submission-status-tag status-tag-pending">Pending</span>';
 
+                                const isRelevantExpertise = s.competency && s.competency.includes('Relevant Expertise');
+                                const cardStyle = isRelevantExpertise ? 'border: 1px solid #c7d2fe; position: relative;' : '';
+                                const expertBadge = isRelevantExpertise ? `
+                                    <span style="display: inline-flex; align-items: center; gap: 4px; background: #e0e7ff; color: #4338ca; padding: 2px 8px; border-radius: 4px; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; margin-top: 4px;">
+                                        <i class="bi bi-bookmark-star-fill"></i> RECORDED ENTRY
+                                    </span>
+                                ` : '';
+
                                 const submissionContent = `
                                     <div class="submission-icon"><i class="bi bi-file-earmark-text"></i></div>
                                     <div class="submission-info-mini">
                                         <h4>${s.title}</h4>
                                         <p>${s.type_ld}</p>
-                                        ${statusTag}
+                                        <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center;">
+                                            ${statusTag}
+                                            ${expertBadge}
+                                        </div>
                                     </div>
                                 `;
 
                                 if (userRole === 'head_hr') {
-                                    submissionList.innerHTML += `<div class="submission-card-mini" style="cursor: default;">${submissionContent}</div>`;
+                                    submissionList.innerHTML += `<div class="submission-card-mini" style="cursor: default; ${cardStyle}">${submissionContent}</div>`;
                                 } else {
                                     submissionList.innerHTML += `
-                                        <a href="<?php echo PUBLIC_ROOT; ?>index.php/admin/view-activity?id=${s.id}" class="submission-card-mini">
+                                        <a href="<?php echo PUBLIC_ROOT; ?>index.php/admin/view-activity?id=${s.id}" class="submission-card-mini" style="${cardStyle}">
                                             ${submissionContent}
                                         </a>
                                     `;

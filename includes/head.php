@@ -37,7 +37,7 @@ if (defined('PUBLIC_ROOT')) {
 
 <!-- Centralized User Design System -->
 <link rel="stylesheet" href="<?php echo $path_to_public; ?>css/layout/sidebar.css?v=3.0">
-<link rel="stylesheet" href="<?php echo $path_to_public; ?>css/user.css?v=3.0">
+<link rel="stylesheet" href="<?php echo $path_to_public; ?>css/user.css?v=<?php echo time(); ?>">
 
 <!-- Global Notification JS -->
 <script src="<?php echo $path_to_public; ?>js/notifications.js"></script>

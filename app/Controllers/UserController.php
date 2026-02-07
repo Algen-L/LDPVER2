@@ -341,9 +341,12 @@ class UserController extends Controller
             'end_date' => $_GET['end_date'] ?? ''
         ];
 
+        // Fetch user data for sidebar display
+        $user = $this->userRepo->getUserById($user_id);
         $activities = $this->activityRepo->getActivitiesByUser($user_id, $filters);
 
         $this->view('user/submissions_progress', [
+            'user' => $user,
             'activities' => $activities,
             'filters' => $filters
         ]);

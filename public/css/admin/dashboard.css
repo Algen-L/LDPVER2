@@ -1,5 +1,10 @@
 @import url("../base/variables.css");
 
+:root {
+    --vibrant-blue: #0ea5e9;
+    --vibrant-orange: #f97316;
+}
+
 /* Dashboard Grid Layouts */
 .stats-row {
     display: grid;
@@ -16,7 +21,7 @@
     align-items: center;
     gap: 20px;
     border: 1px solid var(--border-color);
-    border-top: 4px solid var(--accent-color);
+    border-top: 4px solid var(--accent-color) !important;
     box-shadow: var(--shadow-sm);
     transition: transform var(--transition-base), box-shadow var(--transition-base);
 }
