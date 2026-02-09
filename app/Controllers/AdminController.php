@@ -263,6 +263,9 @@ class AdminController extends Controller
                         $popSGOD++;
                 }
 
+                // 8. Pending Registration Count
+                $hrStats['pending_registrations'] = count($this->userRepo->getPendingUsers());
+
             } catch (Exception $e) { /* Handle error */
             }
         }
@@ -487,7 +490,7 @@ class AdminController extends Controller
 
                 // Handle Profile Picture
                 if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
-                    $uploadDir = '../public/uploads/profile_pics/';
+                    $uploadDir = __DIR__ . '/../../public/uploads/profile_pics/';
                     if (!is_dir($uploadDir))
                         mkdir($uploadDir, 0777, true);
                     $fileName = uniqid() . '_' . preg_replace('/[^a-zA-Z0-9\._-]/', '', basename($_FILES['profile_picture']['name']));
@@ -498,6 +501,13 @@ class AdminController extends Controller
                 }
 
                 if ($password) {
+                    $currentUser = $this->userRepo->getUserById($user_id);
+                    $passkey_input = trim($_POST['passkey_input'] ?? '');
+                    if ($passkey_input !== $currentUser['passkey']) {
+                        $_SESSION['toast'] = ['title' => 'Security Error', 'message' => 'Invalid passkey. You must enter the 6-digit code received during registration.', 'type' => 'error'];
+                        $this->redirect('admin/profile');
+                        return;
+                    }
                     $updateData['password'] = password_hash($password, PASSWORD_DEFAULT);
                 }
 
@@ -622,6 +632,7 @@ class AdminController extends Controller
             $area_of_specialization = trim($_POST['area_of_specialization'] ?? '');
             $age = (int) ($_POST['age'] ?? 0);
             $sex = trim($_POST['sex'] ?? '');
+            $gmail = trim($_POST['gmail'] ?? '');
             $password = trim($_POST['password']);
 
             // Only Super Admin and Head HR can change role
@@ -663,6 +674,7 @@ class AdminController extends Controller
                 'area_of_specialization' => $area_of_specialization,
                 'age' => $age,
                 'sex' => $sex,
+                'gmail' => $gmail,
                 'role' => $role,
                 'profile_picture' => $dbPath
             ];
@@ -678,7 +690,7 @@ class AdminController extends Controller
                 $_SESSION['toast'] = ['title' => 'User Updated', 'message' => 'The user record has been updated successfully.', 'type' => 'success'];
                 $this->redirect('admin/manage-users');
             } else {
-                $message = "Update failed. Please check for duplicate username.";
+                $message = "Update failed. Please check for duplicate username or Gmail address.";
                 $messageType = "error";
             }
         }
@@ -835,7 +847,9 @@ class AdminController extends Controller
             $full_name = trim($_POST['full_name']);
             $office_station = trim($_POST['office_station'] ?? '');
             $position = trim($_POST['position'] ?? '');
-            $role = trim($_POST['role'] ?? 'user'); // Default to user if not set
+            $gmail = trim($_POST['gmail'] ?? '');
+            $employee_number = trim($_POST['employee_number'] ?? '');
+            $role = trim($_POST['role'] ?? 'user');
             $rating_period = trim($_POST['rating_period'] ?? '');
             $area_of_specialization = trim($_POST['area_of_specialization'] ?? '');
             $age = isset($_POST['age']) ? (int) $_POST['age'] : 0;
@@ -1123,5 +1137,118 @@ class AdminController extends Controller
             'user' => $this->userRepo->getUserById($_SESSION['user_id']),
             'notifRepo' => $this->notifRepo
         ]);
+    }
+
+    public function passwordResetManagement()
+    {
+        $this->view('admin/password_reset_management', [
+            'pdo' => $this->pdo,
+            'notifRepo' => $this->notifRepo,
+            'user' => $this->userRepo->getUserById($_SESSION['user_id'])
+        ]);
+    }
+
+    public function getSecurityStats()
+    {
+        if (($_SESSION['role'] ?? '') !== 'super_admin') {
+            echo json_encode(['error' => 'Unauthorized access']);
+            exit;
+        }
+        $pdo = $this->pdo;
+        try {
+            // Summary Stats
+            $stmt = $pdo->query("SELECT COUNT(DISTINCT email) as count FROM reset_request_logs");
+            $usersWithRequests = $stmt->fetchColumn() ?: 0;
+
+            $stmt = $pdo->query("SELECT COUNT(*) as count FROM security_tracking WHERE is_blocked = 1");
+            $blockedUsers = $stmt->fetchColumn() ?: 0;
+
+            $stmt = $pdo->query("SELECT COUNT(*) as count FROM security_tracking WHERE is_blocked = 0");
+            $activeUsers = $stmt->fetchColumn() ?: 0;
+
+            $stmt = $pdo->query("SELECT COUNT(*) as count FROM reset_request_logs WHERE type = 'request'");
+            $totalOtpRequests = $stmt->fetchColumn() ?: 0;
+
+            $stmt = $pdo->query("SELECT SUM(page_visits) as count FROM security_tracking");
+            $pageAccesses = $stmt->fetchColumn() ?: 0;
+
+            $stmt = $pdo->query("SELECT COUNT(*) as count FROM reset_request_logs WHERE type = 'resend'");
+            $totalResends = $stmt->fetchColumn() ?: 0;
+
+            // Table Data
+            $query = "
+                SELECT 
+                    u.full_name, u.gmail as email, u.role, u.profile_picture,
+                    COALESCE(st.page_visits, 0) as page_visits,
+                    COALESCE(st.is_blocked, 0) as is_blocked,
+                    COALESCE(st.last_activity, 'N/A') as last_activity,
+                    (SELECT COUNT(*) FROM reset_request_logs rrl WHERE rrl.email = u.gmail AND (rrl.type = 'request' OR rrl.type = 'resend') AND rrl.requested_at > DATE_SUB(NOW(), INTERVAL 1 HOUR)) as otp_requests,
+                (SELECT COUNT(*) FROM reset_request_logs rrl WHERE rrl.email = u.gmail AND rrl.type = 'resend' AND rrl.requested_at > DATE_SUB(NOW(), INTERVAL 1 HOUR)) as resends,
+                    (SELECT attempts FROM password_resets pr WHERE pr.username = u.username ORDER BY created_at DESC LIMIT 1) as otp_input_attempts
+                FROM users u
+                LEFT JOIN security_tracking st ON u.gmail = st.email
+                WHERE u.gmail IS NOT NULL AND (u.gmail != '' AND (st.id IS NOT NULL OR EXISTS (SELECT 1 FROM reset_request_logs rrl WHERE rrl.email = u.gmail)))
+                ORDER BY st.last_activity DESC
+            ";
+            $stmt = $pdo->query($query);
+            $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            echo json_encode([
+                'stats' => [
+                    'usersWithRequests' => $usersWithRequests,
+                    'blockedUsers' => $blockedUsers,
+                    'activeUsers' => $activeUsers,
+                    'totalOtpRequests' => $totalOtpRequests,
+                    'pageAccesses' => $pageAccesses,
+                    'totalResends' => $totalResends
+                ],
+                'users' => $users
+            ]);
+        } catch (Exception $e) {
+            echo json_encode(['error' => $e->getMessage()]);
+        }
+        exit;
+    }
+
+    public function resetSecurityLimit()
+    {
+        if (($_SESSION['role'] ?? '') !== 'super_admin') {
+            echo json_encode(['status' => 'error', 'message' => 'Unauthorized access']);
+            exit;
+        }
+        $pdo = $this->pdo;
+        $email = $_POST['email'] ?? '';
+        $type = $_POST['type'] ?? '';
+
+        if (!$email || !$type) {
+            echo json_encode(['status' => 'error', 'message' => 'Missing data']);
+            exit;
+        }
+
+        try {
+            switch ($type) {
+                case 'otp_limit':
+                    $pdo->prepare("DELETE FROM reset_request_logs WHERE email = ? AND type = 'request'")->execute([$email]);
+                    break;
+                case 'resend_limit':
+                    $pdo->prepare("DELETE FROM reset_request_logs WHERE email = ? AND type = 'resend'")->execute([$email]);
+                    break;
+                case 'input_tries':
+                    $stmt = $pdo->prepare("SELECT username FROM users WHERE gmail = ?");
+                    $stmt->execute([$email]);
+                    $username = $stmt->fetchColumn();
+                    if ($username) {
+                        $pdo->prepare("UPDATE password_resets SET attempts = 0 WHERE username = ?")->execute([$username]);
+                    }
+                    break;
+                case 'page_visits':
+                    $pdo->prepare("UPDATE security_tracking SET page_visits = 0 WHERE email = ?")->execute([$email]);
+                    break;
+            }
+            echo json_encode(['status' => 'success', 'message' => 'Limit reset successfully']);
+        } catch (Exception $e) {
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+        exit;
     }
 }

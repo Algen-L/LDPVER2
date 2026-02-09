@@ -676,7 +676,8 @@
                                                         <i class="bi bi-camera"></i> Update Photo
                                                     </button>
                                                     <input type="file" name="profile_picture" id="profile_pic_input"
-                                                        style="display: none;" accept="image/*">
+                                                        style="display: none;" accept="image/*"
+                                                        onchange="previewProfilePic(this)">
                                                 </div>
                                                 <p
                                                     style="margin: 0; color: #94a3b8; font-size: 0.8rem; font-weight: 500;">
@@ -735,10 +736,35 @@
                                             </select>
                                         </div>
                                         <div class="form-group" style="grid-column: 1 / -1;">
-                                            <label class="form-label">Update Password (Leave blank to keep
-                                                current)</label>
+                                            <label class="form-label"
+                                                style="display: flex; align-items: center; gap: 8px;">
+                                                Update Password
+                                                <span
+                                                    style="font-size: 0.65rem; color: #94a3b8; font-weight: 500; text-transform: none;">(Leave
+                                                    blank to keep current)</span>
+                                            </label>
                                             <input type="password" name="password" class="form-control"
-                                                placeholder="Enter new password">
+                                                placeholder="Enter new strong password" autocomplete="new-password">
+                                        </div>
+                                        <div class="form-group" style="grid-column: 1 / -1;">
+                                            <label class="form-label"
+                                                style="display: flex; align-items: center; gap: 8px; color: var(--primary);">
+                                                <i class="bi bi-shield-lock-fill"></i> Password Security Verification
+                                            </label>
+                                            <div style="display: flex; gap: 12px; margin-bottom: 8px;">
+                                                <input type="text" name="token_input" id="password_token"
+                                                    class="form-control" placeholder="Enter 6-digit verification token"
+                                                    maxlength="6" style="flex: 1;">
+                                                <button type="button" id="requestTokenBtn"
+                                                    onclick="requestPasswordToken()" class="btn btn-outline-secondary"
+                                                    style="padding: 0 15px; border-radius: 10px; font-weight: 700; font-size: 0.8rem; white-space: nowrap;">
+                                                    Request Token
+                                                </button>
+                                            </div>
+                                            <p style="margin: 0; color: #64748b; font-size: 0.75rem; font-weight: 500;">
+                                                * Required only if changing password. A token will be sent to your
+                                                Gmail. <strong>Token expires in 5 minutes.</strong>
+                                            </p>
                                         </div>
                                     </div>
 
@@ -1189,13 +1215,22 @@
             searchInput.addEventListener('input', filterCerts);
             sortSelect.addEventListener('change', filterCerts);
 
-            // Avatar Preview
+            // Avatar Preview logic
             const imgInput = document.getElementById('profile_pic_input');
-            const preview = document.getElementById('currentAvatar');
-            if (imgInput && preview) {
+            const previewContainer = document.getElementById('avatarPreviewContainer');
+
+            if (imgInput && previewContainer) {
                 imgInput.onchange = evt => {
                     const [file] = imgInput.files;
-                    if (file) preview.src = URL.createObjectURL(file);
+                    if (file) {
+                        let preview = document.getElementById('currentAvatar');
+                        if (!preview) {
+                            // If no image exists yet, create one and remove the placeholder
+                            previewContainer.innerHTML = '<img id="currentAvatar" style="width: 100%; height: 100%; object-fit: cover;">';
+                            preview = document.getElementById('currentAvatar');
+                        }
+                        preview.src = URL.createObjectURL(file);
+                    }
                 }
             }
         });
@@ -1249,6 +1284,49 @@
                 closeMessageModal();
             }
         });
+
+        function requestPasswordToken() {
+            const btn = document.getElementById('requestTokenBtn');
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = "Sending...";
+
+            fetch('?action=request_password_token', {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showToast(data.message, 'success');
+                        // Cooldown removed per user request
+                        btn.disabled = false;
+                        btn.innerText = originalText;
+                    } else {
+                        showToast(data.message, 'error');
+                        btn.disabled = false;
+                        btn.innerText = originalText;
+                    }
+                })
+                .catch(e => {
+                    showToast("An error occurred. Please try again.", 'error');
+                    btn.disabled = false;
+                    btn.innerText = originalText;
+                });
+        }
+
+        function startCooldown(btn, originalText, seconds = 300) {
+            btn.disabled = true;
+            const timer = setInterval(() => {
+                seconds--;
+                btn.innerText = `Wait ${seconds}s`;
+                if (seconds <= 0) {
+                    clearInterval(timer);
+                    btn.disabled = false;
+                    btn.innerText = originalText;
+                }
+            }, 1000);
+        }
     </script>
 </body>
 

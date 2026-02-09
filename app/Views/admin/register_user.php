@@ -82,6 +82,15 @@
                                 </div>
 
                                 <div class="form-group mb-3">
+                                    <label class="form-label label-accent">Gmail Address</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                        <input type="email" name="gmail" class="form-control input-accent"
+                                            placeholder="example@gmail.com" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-group mb-3">
                                     <label class="form-label label-accent">Password</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-key"></i></span>

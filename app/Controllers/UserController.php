@@ -41,6 +41,47 @@ class UserController extends Controller
 
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
+            // 0. Handle AJX Token Request for Password Change
+            if (isset($_GET['action']) && $_GET['action'] == 'request_password_token') {
+                $username = $_SESSION['username'];
+
+                // 1. Check for active token (non-expired) and cooldown
+                $stmt = $this->pdo->prepare("SELECT token, created_at, TIMESTAMPDIFF(SECOND, created_at, NOW()) as diff FROM password_resets WHERE username = ? AND expires_at > NOW() ORDER BY created_at DESC LIMIT 1");
+                $stmt->execute([$username]);
+                $activeToken = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+                if ($activeToken) {
+                    $token = $activeToken['token'];
+                    $message = "Your active verification token has been re-sent to your Gmail. It will expire in 5 minutes.";
+                } else {
+                    // 2. Invalidate all previous/expired tokens for this user
+                    $this->pdo->prepare("DELETE FROM password_resets WHERE username = ?")->execute([$username]);
+
+                    $token = sprintf("%06d", mt_rand(1, 999999));
+                    $message = "Verification token sent to your Gmail. Note: The token expires in 5 minutes, and you can only request a new one every 5 minutes.";
+
+                    // 3. Store new token with 5-minute expiration
+                    $stmt = $this->pdo->prepare("INSERT INTO password_resets (username, token, expires_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 5 MINUTE))");
+                    $stmt->execute([$username, $token]);
+                }
+
+                // Send email
+                $subject = "Security Verification Token - SDO L&D Passbook System";
+                $body = $this->getEmailTemplate(
+                    "Password Change Request",
+                    "Please use the following 6-digit code to complete your password change. This token is valid for 5 minutes.",
+                    $token
+                );
+
+                header('Content-Type: application/json');
+                if ($this->sendEmail($user['gmail'], $user['full_name'], $subject, $body)) {
+                    echo json_encode(['status' => 'success', 'message' => $message]);
+                } else {
+                    echo json_encode(['status' => 'error', 'message' => 'Failed to send verification email.']);
+                }
+                exit;
+            }
+
             // 1. Update Profile Information
             if (isset($_POST['update_profile'])) {
                 $updateData = [
@@ -54,17 +95,38 @@ class UserController extends Controller
                 ];
 
                 if (!empty($_POST['password'])) {
+                    $token_input = trim($_POST['token_input'] ?? '');
+                    $username = $_SESSION['username'];
+
+                    // Verify Token from password_resets table
+                    $stmt = $this->pdo->prepare("SELECT id FROM password_resets WHERE username = ? AND token = ? AND expires_at > NOW() ORDER BY created_at DESC LIMIT 1");
+                    $stmt->execute([$username, $token_input]);
+
+                    if (!$stmt->fetch()) {
+                        $_SESSION['toast'] = ['title' => 'Security Error', 'message' => 'Invalid or expired verification token. Please request a new one.', 'type' => 'error'];
+                        $this->redirect('user/profile');
+                        return;
+                    }
+
+                    // Delete used token
+                    $this->pdo->prepare("DELETE FROM password_resets WHERE username = ?")->execute([$username]);
                     $updateData['password'] = password_hash(trim($_POST['password']), PASSWORD_DEFAULT);
                 }
 
                 // Handle Profile Picture Upload
-                $profile_pic_path = $this->saveUpload('profile_picture', 'avatars', 'avatar_' . $user_id);
+                $profile_pic_path = $this->saveUpload('profile_picture', 'profile_pics', 'avatar_' . $user_id);
                 if ($profile_pic_path) {
                     $updateData['profile_picture'] = $profile_pic_path;
                 }
 
-                if ($this->userRepo->updateUser($user_id, $updateData)) {
+                if ($this->userRepo->updateUserProfile($user_id, $updateData)) {
                     $_SESSION['toast'] = ['title' => 'Success', 'message' => 'Profile updated successfully!', 'type' => 'success'];
+
+                    // Sync Session
+                    $_SESSION['full_name'] = $updateData['full_name'];
+                    if (isset($updateData['profile_picture'])) {
+                        $_SESSION['profile_picture'] = $updateData['profile_picture'];
+                    }
                 }
                 $this->redirect('user/profile');
             }

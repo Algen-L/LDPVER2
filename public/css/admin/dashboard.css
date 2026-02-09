@@ -8,9 +8,18 @@
 /* Dashboard Grid Layouts */
 .stats-row {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 16px;
     margin-bottom: 24px;
+}
+
+.stats-row-5 {
+    grid-template-columns: repeat(5, 1fr) !important;
+}
+
+.stats-row-5 .stat-card {
+    padding: 16px;
+    gap: 12px;
 }
 
 .stat-card {

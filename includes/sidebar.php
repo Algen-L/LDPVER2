@@ -139,6 +139,17 @@ if (isset($_SESSION['user_id']) && isset($notifRepo)) {
                     </div>
                     <span class="nav-text">Register Account</span>
                 </a>
+
+                <?php if ($_SESSION['role'] === 'super_admin'): ?>
+                    <a href="<?php echo $route_prefix; ?>admin/password-reset-management"
+                        class="nav-item <?php echo (strpos($_SERVER['REQUEST_URI'], '/admin/password-reset-management') !== false) ? 'active' : ''; ?>"
+                        data-tooltip="Password Reset">
+                        <div class="nav-icon">
+                            <i class="bi bi-key-fill"></i>
+                        </div>
+                        <span class="nav-text">Password Reset</span>
+                    </a>
+                <?php endif; ?>
             <?php endif; ?>
 
 
@@ -268,17 +279,17 @@ if (isset($_SESSION['user_id']) && isset($notifRepo)) {
                 $display_role = isset($user['position']) ? $user['position'] : (isset($_SESSION['position']) ? $_SESSION['position'] : 'Employee');
                 ?>
                 <?php if (!empty($display_pic)): ?>
-                        <img src="<?php echo $to_public . htmlspecialchars($display_pic); ?>" alt="User" class="user-avatar">
-                    <?php else: ?>
-                            <div class="user-avatar-placeholder">
-                                <?php echo strtoupper(substr($display_name ?: $_SESSION['username'], 0, 1)); ?>
-                            </div>
-                    <?php endif; ?>
-                    <div class="user-details">
-                        <span class="user-name"><?php echo htmlspecialchars($display_name); ?></span>
-                        <span class="user-role"><?php echo htmlspecialchars($display_role); ?></span>
+                    <img src="<?php echo $to_public . htmlspecialchars($display_pic); ?>" alt="User" class="user-avatar">
+                <?php else: ?>
+                    <div class="user-avatar-placeholder">
+                        <?php echo strtoupper(substr($display_name ?: $_SESSION['username'], 0, 1)); ?>
                     </div>
+                <?php endif; ?>
+                <div class="user-details">
+                    <span class="user-name"><?php echo htmlspecialchars($display_name); ?></span>
+                    <span class="user-role"><?php echo htmlspecialchars($display_role); ?></span>
                 </div>
+            </div>
         </a>
         <a href="<?php echo $to_root; ?>includes/logout.php" class="logout-btn-new" title="Log out">
             <i class="bi bi-power"></i>

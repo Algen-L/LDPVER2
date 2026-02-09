@@ -24,7 +24,8 @@ class Router
         $scriptDir = dirname($scriptName);
 
         // Remove script directory from URI
-        if ($scriptDir !== '/' && strpos($uri, $scriptDir) === 0) {
+        // Remove script directory from URI (Case-insensitive for Windows)
+        if ($scriptDir !== '/' && stripos($uri, $scriptDir) === 0) {
             $uri = substr($uri, strlen($scriptDir));
         }
 
@@ -53,6 +54,8 @@ class Router
         }
 
         // 404
-        echo "404 Not Found";
+        // 404
+        echo "404 Not Found. Debug: Method=$method, URI=$uri";
+        // var_dump($this->routes); // Uncomment if needed, but might be too large
     }
 }

@@ -57,6 +57,12 @@ class HRController extends Controller
             ];
 
             if (!empty($_POST['password'])) {
+                $passkey_input = trim($_POST['passkey_input'] ?? '');
+                if ($passkey_input !== $user['passkey']) {
+                    $_SESSION['toast'] = ['title' => 'Security Error', 'message' => 'Invalid passkey. You must enter the 6-digit code received during registration.', 'type' => 'error'];
+                    $this->redirect('hr/profile');
+                    return;
+                }
                 $updateData['password'] = password_hash($_POST['password'], PASSWORD_DEFAULT);
             }
 

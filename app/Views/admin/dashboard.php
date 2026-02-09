@@ -116,7 +116,24 @@
             </header>
 
             <main class="content-wrapper">
-                <div class="stats-row">
+                <?php if (($_SESSION['role'] === 'head_hr' || $_SESSION['role'] === 'hr') && ($hrStats['pending_registrations'] ?? 0) > 0): ?>
+                    <div class="dashboard-alert-banner" onclick="location.href='<?php echo PUBLIC_ROOT; ?>index.php/admin/manage-users?view=verification'" style="cursor: pointer; background: linear-gradient(135, #fff5f5 0%, #fff 100%); border-left: 5px solid #f43f5e; padding: 15px 20px; border-radius: 12px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 15px rgba(244, 63, 94, 0.1);">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div style="background: rgba(244, 63, 94, 0.1); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #f43f5e;">
+                                <i class="bi bi-person-plus-fill" style="font-size: 1.2rem;"></i>
+                            </div>
+                            <div>
+                                <h4 style="margin: 0; color: #1e293b; font-size: 1rem; font-weight: 700;">Action Required: Pending Registrations</h4>
+                                <p style="margin: 0; color: #64748b; font-size: 0.85rem;">There are <?php echo $hrStats['pending_registrations']; ?> new personnel accounts awaiting your verification and approval.</p>
+                            </div>
+                        </div>
+                        <div style="color: #f43f5e; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 5px;">
+                            Review Now <i class="bi bi-arrow-right"></i>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+                <div class="stats-row <?php echo ($_SESSION['role'] === 'head_hr' || $_SESSION['role'] === 'hr') ? 'stats-row-5' : ''; ?>">
                     <?php if ($_SESSION['role'] === 'head_hr' || $_SESSION['role'] === 'hr'): ?>
                         <!-- HR Specific Stats -->
                         <div class="stat-card" style="--accent-color: var(--vibrant-blue);">
@@ -159,6 +176,19 @@
                                 <span class="stat-value"><?php echo number_format($hrStats['active_today'] ?? 0); ?></span>
                             </div>
                         </div>
+
+                        <?php if (($hrStats['pending_registrations'] ?? 0) > 0): ?>
+                            <div class="stat-card" style="--accent-color: #f43f5e; cursor: pointer;" 
+                                 onclick="location.href='<?php echo PUBLIC_ROOT; ?>index.php/admin/manage-users?view=verification'">
+                                <div class="stat-icon" style="background: rgba(244, 63, 94, 0.1); color: #f43f5e;">
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <span class="stat-label">Pending Verification</span>
+                                    <span class="stat-value" style="color: #f43f5e;"><?php echo number_format($hrStats['pending_registrations']); ?></span>
+                                </div>
+                            </div>
+                        <?php endif; ?>
                     <?php else: ?>
                         <!-- Standard Admin Stats -->
                         <div class="stat-card" style="--accent-color: var(--vibrant-blue);">

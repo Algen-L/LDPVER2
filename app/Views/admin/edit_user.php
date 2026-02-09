@@ -177,6 +177,12 @@
                                         value="<?php echo htmlspecialchars($user_to_edit['username']); ?>">
                                 </div>
                                 <div class="form-group">
+                                    <label class="form-label">Gmail Address</label>
+                                    <input type="email" name="gmail" class="form-control" required
+                                        value="<?php echo htmlspecialchars($user_to_edit['gmail'] ?? ''); ?>"
+                                        placeholder="example@gmail.com">
+                                </div>
+                                <div class="form-group">
                                     <label class="form-label">Reset Password (Blank to keep)</label>
                                     <input type="password" name="password" class="form-control" placeholder="••••••••">
                                 </div>

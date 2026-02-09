@@ -126,13 +126,29 @@
                                     </div>
                                 </div>
 
-                                <div class="filter-group profile-input-container" style="margin-bottom: 35px;">
+                                <div class="filter-group profile-input-container" style="margin-bottom: 20px;">
                                     <label>Security Override (Leave blank to keep password)</label>
                                     <div class="profile-input-container mb-0">
                                         <i class="bi bi-shield-lock profile-input-icon"></i>
                                         <input type="password" name="password" class="form-control profile-input-field"
-                                            placeholder="••••••••">
+                                            placeholder="••••••••" autocomplete="new-password">
                                     </div>
+                                </div>
+
+                                <div class="filter-group profile-input-container" style="margin-bottom: 35px;">
+                                    <label style="color: #dc2626; font-weight: 800;">Security Passkey (Required for
+                                        password changes)</label>
+                                    <div class="profile-input-container mb-0">
+                                        <i class="bi bi-shield-lock-fill profile-input-icon"
+                                            style="color: #dc2626;"></i>
+                                        <input type="text" name="passkey_input" class="form-control profile-input-field"
+                                            placeholder="Enter 6-digit code" maxlength="6"
+                                            style="border-color: #fca5a5;">
+                                    </div>
+                                    <small
+                                        style="color: #dc2626; font-style: italic; font-weight: 600; margin-top: 5px; display: block;">
+                                        * Use the 6-digit code from your registration email.
+                                    </small>
                                 </div>
 
                                 <div class="profile-action-footer">

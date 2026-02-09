@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/../vendor/autoload.php';
 
 // Define Root Constants for consistent asset loading
 $scriptName = $_SERVER['SCRIPT_NAME'];
@@ -50,6 +51,8 @@ $router = new Router();
 // Main Entry Point (Login Page)
 $router->add('GET', '/', 'AuthController@index');
 $router->add('POST', '/', 'AuthController@index'); // Handle login/register post here for now
+$router->add('POST', '/send-verification-code', 'AuthController@sendVerificationCode');
+$router->add('POST', '/verify-code', 'AuthController@verifyCode');
 
 // Admin Routes
 $router->add('GET', '/admin/dashboard', 'AdminController@dashboard');
@@ -70,6 +73,9 @@ $router->add('GET', '/admin/view-activity', 'AdminController@viewActivity');
 $router->add('POST', '/admin/view-activity', 'AdminController@viewActivity');
 $router->add('GET', '/admin/edit-activity', 'AdminController@editActivity');
 $router->add('POST', '/admin/edit-activity', 'AdminController@editActivity');
+$router->add('GET', '/admin/password-reset-management', 'AdminController@passwordResetManagement');
+$router->add('GET', '/admin/get-security-stats', 'AdminController@getSecurityStats');
+$router->add('POST', '/admin/reset-security-limit', 'AdminController@resetSecurityLimit');
 
 // User Routes
 $router->add('GET', '/user/home', 'UserController@home');

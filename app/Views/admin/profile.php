@@ -332,7 +332,19 @@
                                         <div class="form-group mt-3">
                                             <label class="form-label">New Password (Leave blank to keep current)</label>
                                             <input type="password" name="password" class="form-control"
-                                                placeholder="••••••••">
+                                                placeholder="••••••••" autocomplete="new-password">
+                                        </div>
+                                        <div class="form-group mt-3">
+                                            <label class="form-label" style="color: #dc2626; font-weight: 800;">
+                                                <i class="bi bi-shield-lock-fill"></i> Security Passkey
+                                            </label>
+                                            <input type="text" name="passkey_input" class="form-control"
+                                                placeholder="Enter 6-digit code" maxlength="6"
+                                                style="border-color: #fca5a5;">
+                                            <small style="color: #dc2626; font-style: italic; font-weight: 600;">
+                                                * Required only for password changes. Use the code from your registration
+                                                email.
+                                            </small>
                                         </div>
                                         <div style="text-align: right; margin-top: 20px;">
                                             <button type="submit" class="btn btn-primary">Save Changes</button>
@@ -430,7 +442,7 @@
                 }
             <?php endif; ?>
 
-            // toggleBtn listener removed (handled by profile-actions.js)
+        // toggleBtn listener removed (handled by profile-actions.js)
         });
     </script>
     <script src="<?php echo PUBLIC_ROOT; ?>js/profile-actions.js?v=<?php echo time(); ?>"></script>

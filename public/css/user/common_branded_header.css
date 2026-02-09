@@ -1,6 +1,6 @@
 /* --- Activity Branded Header (Premium Design) --- */
 .activity-branded-header {
-    background: linear-gradient(135deg, #9ecdf8 0%, #005a8a 100%);
+    background: linear-gradient(to left, #9ecdf8 0%, #005a8a 100%);
     /* Deeper Blue Fade */
     border-radius: 0;
     /* Overflow hidden on card handles clipping */
