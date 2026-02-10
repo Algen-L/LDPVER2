@@ -50,13 +50,6 @@
                         class="tab-item <?php echo $view === 'active' ? 'active' : ''; ?>">
                         <i class="bi bi-people-fill"></i> Active Personnel
                     </a>
-                    <a href="<?php echo PUBLIC_ROOT; ?>index.php/admin/manage-users?view=verification"
-                        class="tab-item <?php echo $view === 'verification' ? 'active' : ''; ?>">
-                        <i class="bi bi-person-check-fill"></i> Pending Requests
-                        <?php if (count($pending_users) > 0): ?>
-                            <span class="tab-badge"><?php echo count($pending_users); ?></span>
-                        <?php endif; ?>
-                    </a>
                     <a href="<?php echo PUBLIC_ROOT; ?>index.php/admin/manage-users?view=notifications"
                         class="tab-item <?php echo $view === 'notifications' ? 'active' : ''; ?>">
                         <i class="bi bi-clock-history"></i> Profile Log
@@ -167,7 +160,16 @@
                                                                 <?php echo htmlspecialchars($u['full_name']); ?>
                                                             </div>
                                                             <div class="user-username-text">
-                                                                @<?php echo htmlspecialchars($u['username']); ?></div>
+                                                                @<?php echo htmlspecialchars($u['username']); ?>
+                                                            </div>
+                                                            <div style="font-size: 0.72rem; color: #64748b; margin-top: 2px;">
+                                                                <i class="bi bi-envelope-at"></i>
+                                                                <?php echo htmlspecialchars($u['gmail'] ?: 'No Email'); ?>
+                                                            </div>
+                                                            <div style="font-size: 0.72rem; color: #64748b;">
+                                                                <i class="bi bi-hash"></i> ID:
+                                                                <?php echo htmlspecialchars($u['employee_number'] ?: '---'); ?>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -227,173 +229,8 @@
                         </div>
                     </div>
 
-                <?php elseif ($view === 'verification'): ?>
-                    <div class="verification-view details-container">
-
-                        <!-- Pending Requests Filter Bar -->
-                        <div class="filter-bar filter-bar-card">
-                            <form method="GET" class="filter-form filter-form-flex">
-                                <input type="hidden" name="view" value="verification">
-
-                                <!-- Search -->
-                                <div class="filter-item search-wrapper">
-                                    <i class="bi bi-search search-icon"></i>
-                                    <input type="text" name="ver_search"
-                                        value="<?php echo htmlspecialchars($_GET['ver_search'] ?? ''); ?>"
-                                        placeholder="Search by Name or Username..." class="search-input">
-                                </div>
-
-                                <!-- Office Division -->
-                                <div class="filter-item select-wrapper min-w-160">
-                                    <select name="ver_office" class="select-input">
-                                        <option value="">All Divisions</option>
-                                        <?php if (!empty($office_categories)): ?>
-                                            <?php foreach ($office_categories as $cat): ?>
-                                                <option value="<?php echo htmlspecialchars($cat); ?>" <?php echo ($_GET['ver_office'] ?? '') === $cat ? 'selected' : ''; ?>>
-                                                    <?php echo htmlspecialchars($cat); ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        <?php endif; ?>
-                                    </select>
-                                    <i class="bi bi-chevron-down select-chevron"></i>
-                                </div>
-
-                                <div class="filter-actions filter-actions-flex">
-                                    <button type="submit" class="btn-apply text-nowrap">Apply Filters</button>
-                                    <?php if (!empty($_GET['ver_search']) || !empty($_GET['ver_office'])): ?>
-                                        <a href="<?php echo PUBLIC_ROOT; ?>index.php/admin/manage-users?view=verification"
-                                            class="btn-clear"><i class="bi bi-x-lg"></i></a>
-                                    <?php endif; ?>
-                                </div>
-                            </form>
-                        </div>
-
-                        <?php if (empty($pending_users)): ?>
-                            <div class="empty-state-card border-dashed">
-                                <i
-                                    class="bi <?php echo (!empty($_GET['ver_search']) || !empty($_GET['ver_office'])) ? 'bi-search' : 'bi-check2-all'; ?> empty-state-icon-large"></i>
-                                <h2 class="mt-4 user-name-text">
-                                    <?php echo (!empty($_GET['ver_search']) || !empty($_GET['ver_office'])) ? 'No Matches Found' : 'All Clear!'; ?>
-                                </h2>
-                                <p class="text-muted fs-5">
-                                    <?php echo (!empty($_GET['ver_search']) || !empty($_GET['ver_office'])) ? 'Try adjusting your filters.' : 'There are no new registration requests to verify.'; ?>
-                                </p>
-                            </div>
-                        <?php else: ?>
-                            <div class="verification-list grid-gap-16">
-                                <?php foreach ($pending_users as $p): ?>
-                                    <div class="ver-item"
-                                        onclick="location.href='<?php echo PUBLIC_ROOT; ?>index.php/admin/manage-users?view=details&id=<?php echo $p['id']; ?>'">
-                                        <div class="ver-user">
-                                            <div class="ver-avatar"><?php echo strtoupper(substr($p['full_name'], 0, 1)); ?></div>
-                                            <div><span class="ver-name"><?php echo htmlspecialchars($p['full_name']); ?></span><span
-                                                    class="ver-handle">@<?php echo htmlspecialchars($p['username']); ?></span></div>
-                                        </div>
-                                        <div><span class="ver-info-label">Office</span><span
-                                                class="ver-info-value"><?php echo htmlspecialchars($p['office_station']); ?></span>
-                                        </div>
-                                        <div><span class="ver-info-label">Position</span><span
-                                                class="ver-info-value"><?php echo htmlspecialchars($p['position'] ?: 'Staff'); ?></span>
-                                        </div>
-                                        <div class="ver-actions" onclick="event.stopPropagation()">
-                                            <form method="POST" style="margin: 0; display: inline;">
-                                                <input type="hidden" name="user_id" value="<?php echo $p['id']; ?>">
-                                                <button type="submit" name="approve_registration" class="ver-btn ver-btn-approve"
-                                                    title="Approve"><i class="bi bi-check-lg"></i></button>
-                                            </form>
-                                            <form method="POST" style="margin: 0; display: inline;"
-                                                onsubmit="return confirm('Reject this registration?');">
-                                                <input type="hidden" name="user_id" value="<?php echo $p['id']; ?>">
-                                                <button type="submit" name="reject_registration" class="ver-btn ver-btn-reject"
-                                                    title="Reject"><i class="bi bi-trash3-fill"></i></button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-
-                <?php elseif ($view === 'details' && $target_user): ?>
-                    <div class="details-container">
-                        <a href="<?php echo PUBLIC_ROOT; ?>index.php/admin/manage-users?view=verification"
-                            class="back-btn"><i class="bi bi-arrow-left"></i> Back
-                            to Verification Requests</a>
-                        <div class="detail-card">
-                            <div class="detail-header">
-                                <div class="user-flex gap-24">
-                                    <div class="ver-avatar size-80 shadow-sm-avatar">
-                                        <?php echo strtoupper(substr($target_user['full_name'], 0, 1)); ?>
-                                    </div>
-                                    <div>
-                                        <h2 class="text-white user-name-large mb-0">
-                                            <?php echo htmlspecialchars($target_user['full_name']); ?>
-                                        </h2>
-                                        <span
-                                            class="badge-username-details">@<?php echo htmlspecialchars($target_user['username']); ?></span>
-                                    </div>
-                                </div>
-                                <div class="actions-flex-end">
-                                    <form method="POST" class="m-0">
-                                        <input type="hidden" name="user_id" value="<?php echo $target_user['id']; ?>">
-                                        <button type="submit" name="reject_registration"
-                                            class="btn btn-reject-account">Reject Account</button>
-                                    </form>
-                                    <form method="POST" class="m-0">
-                                        <input type="hidden" name="user_id" value="<?php echo $target_user['id']; ?>">
-                                        <button type="submit" name="approve_registration"
-                                            class="btn btn-approve-account">Authorize Account</button>
-                                    </form>
-                                </div>
-                            </div>
-                            <div class="detail-body">
-                                <div class="info-grid-modern">
-                                    <div class="info-block"><span class="info-label">Office / Station</span>
-                                        <div class="info-value">
-                                            <?php echo htmlspecialchars($target_user['office_station']); ?>
-                                        </div>
-                                    </div>
-                                    <div class="info-block"><span class="info-label">Current Position</span>
-                                        <div class="info-value">
-                                            <?php echo htmlspecialchars($target_user['position'] ?: 'Not Specified'); ?>
-                                        </div>
-                                    </div>
-                                    <div class="info-block"><span class="info-label">Area of Specialization</span>
-                                        <div class="info-value">
-                                            <?php echo htmlspecialchars($target_user['area_of_specialization'] ?: 'Not Specified'); ?>
-                                        </div>
-                                    </div>
-                                    <div class="info-block"><span class="info-label">Employee Number</span>
-                                        <div class="info-value">
-                                            <?php echo htmlspecialchars($target_user['employee_number'] ?: 'Not Specified'); ?>
-                                        </div>
-                                    </div>
-                                    <div class="info-block"><span class="info-label">Rating Period</span>
-                                        <div class="info-value">
-                                            <?php echo htmlspecialchars($target_user['rating_period'] ?: 'Not Specified'); ?>
-                                        </div>
-                                    </div>
-                                    <div class="info-block"><span class="info-label">Age</span>
-                                        <div class="info-value"><?php echo $target_user['age'] ?: 'Not Specified'; ?></div>
-                                    </div>
-                                    <div class="info-block"><span class="info-label">Sex</span>
-                                        <div class="info-value">
-                                            <?php echo htmlspecialchars($target_user['sex'] ?: 'Not Specified'); ?>
-                                        </div>
-                                    </div>
-                                    <div class="info-block"><span class="info-label">Registration IP</span>
-                                        <div class="info-value"><?php echo $_SERVER['REMOTE_ADDR']; ?></div>
-                                    </div>
-                                    <div class="info-block"><span class="info-label">Registration Date</span>
-                                        <div class="info-value">
-                                            <?php echo date('F j, Y, g:i A', strtotime($target_user['created_at'])); ?>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                <?php elseif ($view === 'notifications'): ?>
+                <?php endif; ?>
+                <?php if ($view === 'notifications'): ?>
                     <div class="notifications-view details-container max-w-1000 mx-auto">
 
                         <!-- Profile Log Filter Bar -->

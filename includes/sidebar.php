@@ -132,7 +132,7 @@ if (isset($_SESSION['user_id']) && isset($notifRepo)) {
                 </a>
 
                 <a href="<?php echo $route_prefix; ?>admin/register-user"
-                    class="nav-item <?php echo ($current_page == 'register.php' || strpos($_SERVER['REQUEST_URI'], '/admin/register-user') !== false) ? 'active' : ''; ?>"
+                    class="nav-item <?php echo (strpos($_SERVER['REQUEST_URI'], '/admin/register-user') !== false) ? 'active' : ''; ?>"
                     data-tooltip="Register Account">
                     <div class="nav-icon">
                         <i class="bi bi-person-plus-fill"></i>
@@ -196,7 +196,7 @@ if (isset($_SESSION['user_id']) && isset($notifRepo)) {
             <?php if ($_SESSION['role'] === 'hr'): ?>
 
                 <a href="<?php echo $route_prefix; ?>admin/register-user"
-                    class="nav-item <?php echo ($current_page == 'register.php' || strpos($_SERVER['REQUEST_URI'], '/admin/register-user') !== false) ? 'active' : ''; ?>"
+                    class="nav-item <?php echo (strpos($_SERVER['REQUEST_URI'], '/admin/register-user') !== false) ? 'active' : ''; ?>"
                     data-tooltip="Register Personnel">
                     <div class="nav-icon">
                         <i class="bi bi-person-plus-fill"></i>

@@ -210,10 +210,10 @@
 }
 
 .input-accent {
-    background: rgba(255, 255, 255, 0.1) !important;
+    background: rgba(255, 255, 255, 0.15) !important;
     border: none !important;
     color: white !important;
-    height: 38px !important;
+    height: 42px !important;
     font-size: 0.88rem !important;
 }
 

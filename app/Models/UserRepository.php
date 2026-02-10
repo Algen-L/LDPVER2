@@ -135,7 +135,7 @@ class UserRepository
      */
     public function getUsersForManagement($filters = [])
     {
-        $sql = "SELECT u.id, u.username, u.full_name, u.office_station, u.role, u.is_active, u.created_at, u.profile_picture,
+        $sql = "SELECT u.id, u.username, u.full_name, u.office_station, u.role, u.is_active, u.created_at, u.profile_picture, u.gmail, u.employee_number,
                 creator.full_name as creator_name,
                 (SELECT MAX(created_at) FROM activity_logs WHERE user_id = u.id AND action = 'Logged In') as last_login
                 FROM users u 

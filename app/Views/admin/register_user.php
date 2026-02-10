@@ -82,15 +82,6 @@
                                 </div>
 
                                 <div class="form-group mb-3">
-                                    <label class="form-label label-accent">Gmail Address</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                                        <input type="email" name="gmail" class="form-control input-accent"
-                                            placeholder="example@gmail.com" required>
-                                    </div>
-                                </div>
-
-                                <div class="form-group mb-3">
                                     <label class="form-label label-accent">Password</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-key"></i></span>
@@ -139,17 +130,23 @@
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label class="form-label">Position / Designation</label>
-                                        <input type="text" name="position" class="form-control"
-                                            placeholder="e.g. Teacher I">
+                                        <label class="form-label fw-bold">Gmail Address</label>
+                                        <input type="email" name="gmail" class="form-control"
+                                            placeholder="example@gmail.com" required>
                                     </div>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label class="form-label fw-bold">Position / Designation</label>
+                                    <input type="text" name="position" class="form-control"
+                                        placeholder="e.g. Teacher I">
                                 </div>
 
                                 <div class="form-section-header">Employment Details</div>
 
                                 <div class="form-grid-2">
                                     <div class="form-group">
-                                        <label class="form-label">Employee Number</label>
+                                        <label class="form-label fw-bold">Employee Number</label>
                                         <input type="text" name="employee_number" class="form-control"
                                             placeholder="e.g. 1234567">
                                     </div>

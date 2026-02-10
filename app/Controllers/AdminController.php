@@ -263,9 +263,6 @@ class AdminController extends Controller
                         $popSGOD++;
                 }
 
-                // 8. Pending Registration Count
-                $hrStats['pending_registrations'] = count($this->userRepo->getPendingUsers());
-
             } catch (Exception $e) { /* Handle error */
             }
         }
@@ -396,20 +393,6 @@ class AdminController extends Controller
                     }
                 }
                 $this->redirect('admin/manage-users');
-            } elseif (isset($_POST['approve_registration'])) {
-                $user_id = (int) $_POST['user_id'];
-                if ($this->userRepo->activateUser($user_id)) {
-                    $_SESSION['toast'] = ['title' => 'Approved', 'message' => 'User registration approved!', 'type' => 'success'];
-                    $this->logRepo->logAction($_SESSION['user_id'], 'Approved Registration', "User ID: $user_id");
-                }
-                $this->redirect('admin/manage-users');
-            } elseif (isset($_POST['reject_registration'])) {
-                $user_id = (int) $_POST['user_id'];
-                if ($this->userRepo->deleteUser($user_id)) {
-                    $_SESSION['toast'] = ['title' => 'Rejected', 'message' => 'Registration rejected and user deleted.', 'type' => 'success'];
-                    $this->logRepo->logAction($_SESSION['user_id'], 'Rejected Registration', "User ID: $user_id");
-                }
-                $this->redirect('admin/manage-users');
             }
         }
 
@@ -422,12 +405,6 @@ class AdminController extends Controller
             'search' => trim($_GET['search'] ?? ''),
             'role' => trim($_GET['filter_role'] ?? ''),
             'office' => trim($_GET['filter_office'] ?? '')
-        ];
-
-        // Verification View Filters
-        $ver_filters = [
-            'search' => trim($_GET['ver_search'] ?? ''),
-            'office' => trim($_GET['ver_office'] ?? '')
         ];
 
         // Audit Log Filters
@@ -450,7 +427,6 @@ class AdminController extends Controller
         }
 
         $users = ($view === 'active') ? $this->userRepo->getUsersForManagement($filters) : [];
-        $pending_users = $this->userRepo->getPendingUsers($ver_filters);
         $target_user = ($view === 'details' && $target_id) ? $this->userRepo->getUserById($target_id) : null;
 
         // Fetch logs for Notifications view
@@ -462,7 +438,6 @@ class AdminController extends Controller
             'filters' => $filters,
             'office_categories' => $office_categories,
             'users' => $users,
-            'pending_users' => $pending_users,
             'target_user' => $target_user,
             'audit_logs' => $audit_logs,
             'pdo' => $this->pdo,
@@ -633,6 +608,7 @@ class AdminController extends Controller
             $age = (int) ($_POST['age'] ?? 0);
             $sex = trim($_POST['sex'] ?? '');
             $gmail = trim($_POST['gmail'] ?? '');
+            $employee_number = trim($_POST['employee_number'] ?? '');
             $password = trim($_POST['password']);
 
             // Only Super Admin and Head HR can change role
@@ -675,6 +651,7 @@ class AdminController extends Controller
                 'age' => $age,
                 'sex' => $sex,
                 'gmail' => $gmail,
+                'employee_number' => $employee_number,
                 'role' => $role,
                 'profile_picture' => $dbPath
             ];
@@ -890,6 +867,8 @@ class AdminController extends Controller
                         'area_of_specialization' => $area_of_specialization,
                         'age' => $age,
                         'sex' => $sex,
+                        'gmail' => $gmail,
+                        'employee_number' => $employee_number,
                         'profile_picture' => $dbPath,
                         'role' => $role,
                         'created_by' => $_SESSION['user_id'],

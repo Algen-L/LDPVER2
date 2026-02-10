@@ -231,6 +231,11 @@
                     <input type="text" id="fp_token" class="form-control" placeholder="6-digit token" maxlength="6">
                 </div>
                 <button type="button" class="btn" id="fpVerifyBtn" onclick="verifyResetToken()">Verify Token</button>
+                <div style="margin-top: 15px; text-align: center;">
+                    <span class="toggle-link" id="fpResendBtn" onclick="resendResetToken()" style="font-size: 0.85rem; color: var(--primary); cursor: pointer;">
+                        <i class="bi bi-arrow-clockwise"></i> Resend Token
+                    </span>
+                </div>
             </div>
 
             <div id="fpStep3" style="display: none;">
@@ -338,8 +343,40 @@
                             notifications.</small>
                     </div>
 
-                    <button type="button" class="btn" id="registerBtn" onclick="submitRegistration()">Register
-                        Account</button>
+                    <button type="button" class="btn" id="registerBtn" onclick="submitRegistration()">Next: Verify
+                        Email</button>
+                </div>
+
+                <!-- STEP 2: Email Verification -->
+                <div id="regStep2" style="display: none;">
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">
+                        We've sent a 6-digit verification code to <strong id="display_reg_email"></strong>. Please
+                        enter it below to complete your registration.
+                    </p>
+                    <div class="form-group">
+                        <label>Verification Code <span class="required-asterisk">*</span></label>
+                        <div class="verification-input-container">
+                            <input type="text" class="code-digit reg-digit" maxlength="1" pattern="\d*"
+                                inputmode="numeric">
+                            <input type="text" class="code-digit reg-digit" maxlength="1" pattern="\d*"
+                                inputmode="numeric">
+                            <input type="text" class="code-digit reg-digit" maxlength="1" pattern="\d*"
+                                inputmode="numeric">
+                            <input type="text" class="code-digit reg-digit" maxlength="1" pattern="\d*"
+                                inputmode="numeric">
+                            <input type="text" class="code-digit reg-digit" maxlength="1" pattern="\d*"
+                                inputmode="numeric">
+                            <input type="text" class="code-digit reg-digit" maxlength="1" pattern="\d*"
+                                inputmode="numeric">
+                        </div>
+                        <input type="hidden" name="reg_verification_code" id="reg_verification_code">
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button type="button" class="btn btn-secondary" onclick="backToStep1()"
+                            style="flex: 1; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);">Back</button>
+                        <button type="button" class="btn" id="verifyRegBtn" onclick="verifyRegistrationCode()"
+                            style="flex: 2;">Verify & Register</button>
+                    </div>
                 </div>
             </form>
             <div class="footer-text">
@@ -517,6 +554,42 @@
                 });
         }
 
+        function resendResetToken() {
+            const email = document.getElementById('reset_token_email').value;
+            const btn = document.getElementById('fpResendBtn');
+            const originalText = btn.innerHTML;
+
+            btn.style.pointerEvents = 'none';
+            btn.style.opacity = '0.7';
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Resending...';
+
+            const formData = new FormData();
+            formData.append('forgot_password', '1');
+            formData.append('email', email);
+
+            fetch('', {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showToast(data.message, 'success');
+                    } else {
+                        showToast(data.message, 'error');
+                    }
+                })
+                .catch(e => showToast("An error occurred. Please try again.", 'error'))
+                .finally(() => {
+                    setTimeout(() => {
+                        btn.style.pointerEvents = 'auto';
+                        btn.style.opacity = '1';
+                        btn.innerHTML = originalText;
+                    }, 2000);
+                });
+        }
+
         function startCooldown(btn, originalText, seconds = 300) {
             btn.disabled = true;
             const timer = setInterval(() => {
@@ -617,21 +690,23 @@
             }
 
             if (!isValid) {
-                if (!email.endsWith('@gmail.com')) return; // Already showed toast
+                if (email && !email.endsWith('@gmail.com')) return; // Already showed toast
                 showToast("Please fill in all required fields.", 'error', 4000);
                 return;
             }
 
             const registerBtn = document.getElementById('registerBtn');
+            const originalText = registerBtn.innerText;
             registerBtn.disabled = true;
             registerBtn.classList.add('btn-loading');
-            registerBtn.innerText = "Creating account...";
+            registerBtn.innerText = "Requesting code...";
 
             // Collect registration form data
             const regForm = document.getElementById('registerForm');
             const formData = new FormData(regForm);
+            formData.append('request_registration_code', '1');
 
-            // Submit registration via AJAX
+            // Submit registration request via AJAX
             fetch(window.location.href, {
                 method: 'POST',
                 body: formData,
@@ -639,44 +714,106 @@
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             })
-                .then(async regResponse => {
-                    const regText = await regResponse.text();
-                    try {
-                        const data = JSON.parse(regText);
-                        if (data.status === 'success') {
-                            showToast("Registration successful! Your account is pending HR approval. Please login after approval.", 'success', 6000);
-                            setTimeout(() => {
-                                window.location.href = window.location.href.split('?')[0];
-                            }, 2000);
-                        } else {
-                            showToast(data.message || "Registration failed.", 'error', 4000);
-                            registerBtn.disabled = false;
-                            registerBtn.classList.remove('btn-loading');
-                            registerBtn.innerText = "Register Account";
-                        }
-                    } catch (e) {
-                        // Fallback if not JSON (though controller should return JSON for AJAX)
-                        if (regText.includes('Registration successful')) {
-                            showToast("Registration successful! Your account is pending HR approval.", 'success', 6000);
-                            setTimeout(() => {
-                                window.location.href = window.location.href.split('?')[0];
-                            }, 2000);
-                        } else {
-                            showToast("Registration failed. Please try again.", 'error', 4000);
-                            registerBtn.disabled = false;
-                            registerBtn.classList.remove('btn-loading');
-                            registerBtn.innerText = "Register Account";
-                        }
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showToast(data.message, 'success');
+                        document.getElementById('display_reg_email').innerText = email;
+                        document.getElementById('regStep1').style.display = 'none';
+                        document.getElementById('regStep2').style.display = 'block';
+                    } else {
+                        showToast(data.message || "Request failed.", 'error', 4000);
                     }
+                    registerBtn.disabled = false;
+                    registerBtn.classList.remove('btn-loading');
+                    registerBtn.innerText = originalText;
                 })
                 .catch(error => {
                     console.error('Registration Error:', error);
-                    showToast("Registration failed. Please try again.", 'error', 4000);
+                    showToast("An error occurred. Please try again.", 'error', 4000);
                     registerBtn.disabled = false;
                     registerBtn.classList.remove('btn-loading');
-                    registerBtn.innerText = "Register Account";
+                    registerBtn.innerText = originalText;
                 });
         }
+
+        function backToStep1() {
+            document.getElementById('regStep1').style.display = 'block';
+            document.getElementById('regStep2').style.display = 'none';
+        }
+
+        function verifyRegistrationCode() {
+            const digits = document.querySelectorAll('.reg-digit');
+            let code = '';
+            digits.forEach(d => code += d.value);
+
+            if (code.length !== 6) {
+                showToast("Please enter the 6-digit verification code.", 'error');
+                return;
+            }
+
+            const btn = document.getElementById('verifyRegBtn');
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            btn.classList.add('btn-loading');
+            btn.innerText = "Verifying...";
+
+            const formData = new FormData();
+            formData.append('register', '1');
+            formData.append('verify_registration_code', '1');
+            formData.append('code', code);
+
+            fetch(window.location.href, {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showToast(data.message, 'success', 6000);
+                        setTimeout(() => {
+                            window.location.href = window.location.href.split('?')[0];
+                        }, 2000);
+                    } else if (data.status === 'attempts_exceeded') {
+                        showToast(data.message, 'error', 5000);
+                        setTimeout(() => {
+                            backToStep1();
+                            // Clear digits
+                            document.querySelectorAll('.reg-digit').forEach(d => d.value = '');
+                            btn.disabled = false;
+                            btn.classList.remove('btn-loading');
+                            btn.innerText = originalText;
+                        }, 2000);
+                    } else {
+                        showToast(data.message, 'error');
+                        btn.disabled = false;
+                        btn.classList.remove('btn-loading');
+                        btn.innerText = originalText;
+                    }
+                })
+                .catch(e => {
+                    showToast("An error occurred. Please try again.", 'error');
+                    btn.disabled = false;
+                    btn.classList.remove('btn-loading');
+                    btn.innerText = originalText;
+                });
+        }
+
+        // Handle auto-focus for verification digits
+        document.querySelectorAll('.reg-digit').forEach((input, index, array) => {
+            input.addEventListener('input', (e) => {
+                if (e.target.value.length === 1 && index < array.length - 1) {
+                    array[index + 1].focus();
+                }
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && e.target.value.length === 0 && index > 0) {
+                    array[index - 1].focus();
+                }
+            });
+        });
 
         document.addEventListener('DOMContentLoaded', function () {
             new TomSelect('#office_select', {

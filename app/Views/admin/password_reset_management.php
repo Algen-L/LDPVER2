@@ -401,8 +401,8 @@
                         <div class="progress-mini"><div class="progress-bar" style="width: ${Math.min(100, (u.otp_input_attempts / inputLimit) * 100)}%; background: ${u.otp_input_attempts >= inputLimit ? 'var(--danger)' : 'var(--warning)'}"></div></div>
                     </td>
                     <td>
-                        <div style="font-weight: 600;">${u.resends}/--</div>
-                        <div class="progress-mini"><div class="progress-bar" style="width: ${Math.min(100, (u.resends / resendLimit) * 100)}%; background: var(--primary)"></div></div>
+                        <div style="font-weight: 600;">${u.resends}/${reqLimit}</div>
+                        <div class="progress-mini"><div class="progress-bar" style="width: ${Math.min(100, (u.resends / reqLimit) * 100)}%; background: var(--primary)"></div></div>
                     </td>
                     <td>
                         <span class="badge ${u.is_blocked ? 'badge-blocked' : 'badge-active'}">
@@ -467,7 +467,8 @@
         function formatDateTime(dateTimeStr) {
             const date = new Date(dateTimeStr);
             return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' ' +
-                date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }); }
+                date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+        }
     </script>
 </body>
 

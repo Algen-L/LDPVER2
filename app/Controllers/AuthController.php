@@ -20,51 +20,157 @@ class AuthController extends Controller
 
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (isset($_POST['register'])) {
-                $isRegistration = true;
-                $username = trim($_POST['reg_username']);
-                $password = trim($_POST['reg_password']);
-                $full_name = trim($_POST['full_name']);
-                $office_station = trim($_POST['office_station'] ?? '');
-                $position = trim($_POST['position'] ?? '');
-                $employee_number = trim($_POST['employee_number'] ?? '');
-                $area_of_specialization = trim($_POST['area_of_specialization'] ?? '');
-                $age = isset($_POST['age']) ? (int) $_POST['age'] : 0;
-                $sex = trim($_POST['sex'] ?? '');
-                $gmail = trim($_POST['gmail'] ?? '');
-                if (empty($username) || empty($password) || empty($full_name) || empty($gmail)) {
-                    $message = "Please fill in all required fields.";
-                } else {
+                if (isset($_POST['request_registration_code'])) {
+                    $username = trim($_POST['reg_username']);
+                    $password = trim($_POST['reg_password']);
+                    $gmail = trim($_POST['gmail'] ?? '');
+
+                    // Basic validation
+                    if (empty($username) || empty($password) || empty($gmail)) {
+                        echo json_encode(['status' => 'error', 'message' => "Required fields missing."]);
+                        exit;
+                    }
+
                     // Check if username or email exists
                     $stmt = $pdo->prepare("SELECT id FROM users WHERE username = ? OR gmail = ?");
                     $stmt->execute([$username, $gmail]);
                     if ($stmt->fetch()) {
-                        $message = "Username or Gmail already exists.";
-                    } else {
-                        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-                        $sql = "INSERT INTO users (username, password, full_name, office_station, position, area_of_specialization, age, sex, gmail, employee_number, is_active, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 'user')";
-                        $stmt = $pdo->prepare($sql);
-                        try {
-                            if ($stmt->execute([$username, $hashed_password, $full_name, $office_station, $position, $area_of_specialization, $age, $sex, $gmail, $employee_number])) {
-                                $message = "Registration successful! Your account is pending HR verification.";
-                                if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest' || isset($_POST['register'])) {
-                                    header('Content-Type: application/json');
-                                    echo json_encode(['status' => 'success', 'message' => $message]);
-                                    exit;
-                                }
-                                $isRegistration = false; // Switch back to login
-                            } else {
-                                $message = "Registration failed. Please try again.";
-                            }
-                        } catch (\PDOException $e) {
-                            $message = "Something went wrong: " . $e->getMessage();
-                        }
+                        echo json_encode(['status' => 'error', 'message' => "Username or Gmail already exists."]);
+                        exit;
                     }
+
+                    // 0. Check Hourly Rate Limit (3 per hour)
+                    $stmt = $pdo->prepare("SELECT COUNT(*) FROM registration_request_logs WHERE email = ? AND requested_at > DATE_SUB(NOW(), INTERVAL 1 HOUR)");
+                    $stmt->execute([$gmail]);
+                    $requestCount = $stmt->fetchColumn();
+
+                    if ($requestCount >= 3) {
+                        echo json_encode(['status' => 'error', 'message' => 'Maximum registration code requests reached for this hour. Please try again in an hour.']);
+                        exit;
+                    }
+
+                    // Generate 6-digit code
+                    $code = sprintf("%06d", mt_rand(100000, 999999));
+
+                    // Store registration data in session
+                    $_SESSION['reg_data'] = [
+                        'username' => $username,
+                        'password' => password_hash($password, PASSWORD_DEFAULT),
+                        'full_name' => trim($_POST['full_name']),
+                        'office_station' => trim($_POST['office_station'] ?? ''),
+                        'position' => trim($_POST['position'] ?? ''),
+                        'employee_number' => trim($_POST['employee_number'] ?? ''),
+                        'area_of_specialization' => trim($_POST['area_of_specialization'] ?? ''),
+                        'age' => (int) ($_POST['age'] ?? 0),
+                        'sex' => trim($_POST['sex'] ?? ''),
+                        'gmail' => $gmail,
+                        'code' => $code,
+                        'attempts' => 0,
+                        'expires' => time() + (10 * 60) // 10 minutes
+                    ];
+
+                    // Log the request
+                    $pdo->prepare("INSERT INTO registration_request_logs (email) VALUES (?)")->execute([$gmail]);
+
+                    // Send Email
+                    $subject = "Registration Verification Code - SDO L&D Passbook System";
+                    $body = $this->getEmailTemplate(
+                        "Registration Verification",
+                        "Thank you for registering. Please use the following 6-digit code to verify your email address. This code is valid for 10 minutes.",
+                        $code
+                    );
+
+                    if ($this->sendEmail($gmail, $_POST['full_name'], $subject, $body)) {
+                        echo json_encode(['status' => 'success', 'message' => "Verification code sent to $gmail."]);
+                    } else {
+                        echo json_encode(['status' => 'error', 'message' => "Failed to send verification email. Please try again."]);
+                    }
+                    exit;
                 }
 
+                if (isset($_POST['verify_registration_code'])) {
+                    $code = trim($_POST['code'] ?? '');
 
-                // If AJAX failed or was not successful yet
+                    if (!isset($_SESSION['reg_data']) || empty($_SESSION['reg_data'])) {
+                        echo json_encode(['status' => 'error', 'message' => "Session expired. Please start over."]);
+                        exit;
+                    }
+
+                    $reg_data = $_SESSION['reg_data'];
+
+                    if (time() > $reg_data['expires']) {
+                        unset($_SESSION['reg_data']);
+                        echo json_encode(['status' => 'error', 'message' => "Verification code expired. Please start over."]);
+                        exit;
+                    }
+
+                    if ($reg_data['code'] !== $code) {
+                        $_SESSION['reg_data']['attempts']++;
+                        $currentAttempts = $_SESSION['reg_data']['attempts'];
+
+                        if ($currentAttempts >= 5) {
+                            unset($_SESSION['reg_data']);
+                            echo json_encode(['status' => 'attempts_exceeded', 'message' => "Too many failed attempts. Your registration session has been cleared. Please start over."]);
+                        } else {
+                            $remaining = 5 - $currentAttempts;
+                            echo json_encode(['status' => 'error', 'message' => "Invalid verification code. $remaining attempts remaining."]);
+                        }
+                        exit;
+                    }
+
+                    // Finalize Registration - Set is_active = 1 for immediate access
+                    $sql = "INSERT INTO users (username, password, full_name, office_station, position, area_of_specialization, age, sex, gmail, employee_number, is_active, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 'user')";
+                    $stmt = $pdo->prepare($sql);
+
+                    try {
+                        if (
+                            $stmt->execute([
+                                $reg_data['username'],
+                                $reg_data['password'],
+                                $reg_data['full_name'],
+                                $reg_data['office_station'],
+                                $reg_data['position'],
+                                $reg_data['area_of_specialization'],
+                                $reg_data['age'],
+                                $reg_data['sex'],
+                                $reg_data['gmail'],
+                                $reg_data['employee_number']
+                            ])
+                        ) {
+                            $newUserId = $pdo->lastInsertId();
+
+                            // Notify Head HR about the new account
+                            $stmtHead = $pdo->prepare("SELECT id FROM users WHERE role = 'head_hr'");
+                            $stmtHead->execute();
+                            $headHRs = $stmtHead->fetchAll(\PDO::FETCH_ASSOC);
+
+                            if ($headHRs) {
+                                $notifRepo = new \App\Models\NotificationRepository($pdo);
+                                foreach ($headHRs as $hr) {
+                                    $notifRepo->sendNotification($newUserId, $hr['id'], "A new account has been created and verified: " . $reg_data['full_name'] . " (" . $reg_data['gmail'] . ")");
+                                }
+                            }
+
+                            // Log the registration in activity_logs
+                            $logRepo = new \App\Models\ActivityLogRepository($pdo);
+                            $logRepo->logAction($newUserId, 'Profile Created', "New account registered and verified via Gmail: " . $reg_data['gmail']);
+
+                            unset($_SESSION['reg_data']);
+                            echo json_encode(['status' => 'success', 'message' => "Registration successful! Your account is now active. You can now log in."]);
+                        } else {
+                            echo json_encode(['status' => 'error', 'message' => "Registration failed. Please try again."]);
+                        }
+                    } catch (\PDOException $e) {
+                        echo json_encode(['status' => 'error', 'message' => "Database error: " . $e->getMessage()]);
+                    }
+                    exit;
+                }
+
+                // Fallback for non-AJAX or old logic (though the UI now uses AJAX only)
+                $isRegistration = true;
+                $message = "Invalid or outdated registration request. Please refresh the page.";
+
                 if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-                    header('Content-Type: application/json');
                     echo json_encode(['status' => 'error', 'message' => $message]);
                     exit;
                 }
